@@ -71,6 +71,11 @@ QUESTIONS = {
 REQUIRED = list(QUESTIONS)
 
 
+def urgent(message: str) -> None:
+    """Nothing a visitor can say here needs an urgent, fixed reply."""
+    return None
+
+
 def required(lead: dict) -> list[str]:
     """The details to collect, in the order to ask. Every visitor gets the same questions here."""
     return REQUIRED

@@ -8,6 +8,8 @@ A profile module must define:
     OFFER, OFFER_CHOICES, OFFER_TRIGGER      the offer to take details, and the question pattern that prompts it
     NOT_FOUND, HELP, AFTER_SUBMIT, CHAT_END  fixed replies
     WANTS                                    pattern meaning "start taking my details"
+    urgent(message)                          None, or (fixed reply, details to record) for a message that must
+                                             get a set answer written by a person, never one from the AI
     required(lead)                           the details to collect, in order; may depend on earlier answers
     question(field, lead)                    (question text, buttons) for one detail
     rule_fields(message, asked)              details found by plain rules

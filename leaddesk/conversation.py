@@ -54,8 +54,18 @@ class Conversation:
         p = self.profile
         session.messages += 1
         session.updated = time.time()
-        understood = self.extractor.extract(message, session.asked, session.lead)
+        # Decided by the profile's plain code, before the AI sees the message.
+        urgent = p.urgent(message)
+        try:
+            understood = self.extractor.extract(message, session.asked, session.lead)
+        except Exception:
+            if not urgent:
+                raise
+            # The urgent reply must reach the visitor even when the AI service is down.
+            understood = {"fields": {}, "question": "", "wants_consultation": False, "declined": False}
         new = {k: v for k, v in understood["fields"].items() if v and k not in session.lead}
+        if urgent:
+            new.update(urgent[1])
         if session.submitted:
             new = {}
         session.lead.update(new)
@@ -63,6 +73,9 @@ class Conversation:
         parts: list[str] = []
         choices: list[str] = []
         question = understood["question"]
+        if urgent:
+            parts.append(urgent[0])
+            question = ""   # the fixed reply is the whole answer: nothing from the documents or the AI
         if question:
             session.questions.append(question[:200])
             answer = self.faq.answer(question)

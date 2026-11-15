@@ -1,6 +1,7 @@
-"""Parsers every business profile shares: email addresses, names and
-tap-to-answer choices. Anything specific to one business (phone formats,
-budgets, areas, questions) lives in its profile under leaddesk/profiles/."""
+"""Parsers that more than one business profile uses: email addresses, names,
+tap-to-answer choices, UK phone numbers and day-and-time preferences.
+Anything specific to one business (budgets, areas, questions) lives in its
+profile under leaddesk/profiles/."""
 from __future__ import annotations
 
 import re
@@ -26,7 +27,8 @@ _NAME_PATTERNS = [r"\bmy name is ([a-z][a-z .'-]{1,40})", r"\bthis is ([a-z][a-z
                   r"\b(?:i am|i'm|im) ([a-z][a-z'-]{1,20})(?=\s*[.,!])"]
 _NOT_NAMES = {"looking", "interested", "planning", "from", "in", "not", "here", "just", "a", "the", "fine", "ok",
               "okay", "i", "i'm", "im", "we", "we're", "yes", "no", "hi", "hello", "hey", "thanks", "sure", "need",
-              "want", "what", "how", "is", "do", "can"}
+              "want", "what", "how", "is", "do", "can", "now", "today", "tomorrow", "asap", "please", "help",
+              "nothing", "none", "anything", "anytime"}
 # Everyday words that are also surnames (Hannah Price, Tom House): not a name on their own or in first place.
 _NOT_FIRST_NAMES = {"kitchen", "home", "flat", "house", "price", "cost"}
 
@@ -52,4 +54,51 @@ def parse_name(text: str, was_asked: bool) -> str | None:
             return clean_name(candidate)
     if was_asked:
         return clean_name(text)
+    return None
+
+
+# UK numbers: 0 or +44, then ten digits starting 1, 2, 3 (landlines) or 7 (mobiles).
+UK_PHONE = re.compile(r"(?<![\d£,.])(?:\+?44[\s-]?(?:\(0\)[\s-]?)?|0)([1237](?:[\s-]?\d){9})(?!\d)")
+
+
+def parse_uk_phone(text: str) -> str | None:
+    """UK phone number as +44XXXXXXXXXX, or None."""
+    match = UK_PHONE.search(text or "")
+    return "+44" + re.sub(r"\D", "", match.group(1)) if match else None
+
+
+def display_uk_phone(phone: str) -> str:
+    """+447700900123 -> 07700 900123"""
+    return f"0{phone[3:7]} {phone[7:]}" if len(phone) == 13 else phone
+
+
+def plain(text: str, limit: int = 60) -> str:
+    """Free text kept for the team: short, and never starting like a spreadsheet formula."""
+    return " ".join(str(text).split())[:limit].lstrip("=+-@ ").strip(" .!")
+
+
+DAY_OR_TIME = re.compile(r"\b((mon|tues|wednes|thurs|fri|satur|sun)days?|mornings?|afternoons?|evenings?|"
+                         r"weekends?|weekdays?)\b", re.IGNORECASE)
+_FILLER = re.compile(r"\b(ok|okay|yes|yeah|sure|then|maybe|probably|please|i think|let's say)\b", re.IGNORECASE)
+
+
+def time_preference(text: str, was_asked: bool, choices: dict[str, str], bands: list[tuple[str, str]],
+                    context: str) -> str | None:
+    """When a visitor can come in: one of the buttons (`choices`), or, only when we asked, their own words
+    such as 'Tuesday after 5'. `bands` maps a pattern to each button; outside our own question a message
+    must also match `context` (words like 'viewing' or 'appointment') to count."""
+    text = " ".join(_FILLER.sub(" ", text or "").split()).strip(" ,.!")   # "ok saturday then" is just "Saturday"
+    label = choice_by_label(text, choices)
+    if label:
+        return label
+    lower = text.lower()
+    if not was_asked and not re.search(context, lower):
+        return None
+    negative = re.search(r"\b(not|except|apart from|can't|cannot|never|no)\b", lower.replace("’", "'"))
+    for key, pattern in bands:
+        if re.search(pattern, lower) and not (negative and was_asked):
+            # A named day and time ("Tuesday after 5") is more useful to the team than the band.
+            return plain(text) if was_asked and len(text.split()) <= 8 and "?" not in text and len(text) > 12 else key
+    if was_asked and "?" not in text and len(text.split()) <= 8:
+        return plain(text) or None
     return None

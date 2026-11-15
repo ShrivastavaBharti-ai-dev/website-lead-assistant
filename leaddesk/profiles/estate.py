@@ -15,7 +15,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from ..fields import choice_by_label, clean_name, parse_email, parse_name
+from ..fields import (DAY_OR_TIME, UK_PHONE, choice_by_label, clean_name, parse_email, parse_name, plain,
+                      time_preference)
+from ..fields import display_uk_phone as display_phone
+from ..fields import parse_uk_phone as parse_phone
 from ..qualify import Qualification
 
 KEY = "estate"
@@ -31,6 +34,13 @@ OFFER_CHOICES = ["Book a viewing", "Get a free valuation", "I have another quest
 NOT_FOUND = "I'm not sure about that one, so I won't guess. One of our team can answer it on a call."
 HELP = "I can answer questions about our properties, fees and viewings, or book a viewing or a free valuation for you."
 AFTER_SUBMIT = "Your details are with our team; they'll call you soon. Anything else I can help with?"
+
+
+def urgent(message: str) -> None:
+    """Nothing a visitor can say here needs an urgent, fixed reply."""
+    return None
+
+
 CHAT_END = ("We've reached the end of this chat. Please call 0117 496 0123 or email "
             "hello@harbourandfinch.example and our team will help.")
 OFFER_TRIGGER = re.compile(r"\b(price|how much|fees?|cost|costs|available|view|viewing|viewings|valuation|worth|deposit)\b",
@@ -103,21 +113,6 @@ def question(field: str, lead: dict) -> tuple[str, list[str]]:
 
 
 # ------------------------------------------------------------------ validators
-# UK numbers: 0 or +44, then ten digits starting 1, 2, 3 (landlines) or 7 (mobiles).
-_PHONE = re.compile(r"(?<![\d£,.])(?:\+?44[\s-]?(?:\(0\)[\s-]?)?|0)([1237](?:[\s-]?\d){9})(?!\d)")
-
-
-def parse_phone(text: str) -> str | None:
-    """UK phone number as +44XXXXXXXXXX, or None."""
-    match = _PHONE.search(text or "")
-    return "+44" + re.sub(r"\D", "", match.group(1)) if match else None
-
-
-def display_phone(phone: str) -> str:
-    """+447700900123 -> 07700 900123"""
-    return f"0{phone[3:7]} {phone[7:]}" if len(phone) == 13 else phone
-
-
 def match_area(text: str) -> str | None:
     """A Bristol area we cover; plain "Bristol" counts too. None for anywhere else."""
     lower = (text or "").lower().replace("’", "'")
@@ -142,7 +137,7 @@ def parse_budget_pounds(text: str, was_asked: bool = False) -> int | None:
     """'£350k' -> 350000, '300-350k' -> 350000 (upper end), '£1,200 pcm' -> 1200.
     A bare number only counts if we just asked for the budget, or it is clearly a price (50,000 or more)."""
     amounts = []
-    for pound, number, unit, monthly in _MONEY.findall(_PHONE.sub(" ", text or "")):
+    for pound, number, unit, monthly in _MONEY.findall(UK_PHONE.sub(" ", text or "")):
         unit = unit.strip().lower()
         value = float(number.replace(",", "")) * (1_000 if unit in ("k", "thousand") else
                                                   1_000_000 if unit in ("m", "million") else 1)
@@ -239,37 +234,17 @@ def move_in(text: str, was_asked: bool = False) -> str | None:
     return None
 
 
-_DAY_OR_TIME = re.compile(r"\b((mon|tues|wednes|thurs|fri|satur|sun)days?|mornings?|afternoons?|evenings?|"
-                          r"weekends?|weekdays?)\b", re.IGNORECASE)
-
-
-def _plain(text: str, limit: int = 60) -> str:
-    """Free text kept for the team: short, and never starting like a spreadsheet formula."""
-    return " ".join(str(text).split())[:limit].lstrip("=+-@ ").strip(" .!")
-
-
 def visit_time(text: str, was_asked: bool = False) -> str | None:
     """One of the buttons, or (only when we asked) the visitor's own words, like 'Tuesday after 5'."""
-    # "ok saturday then" is just "Saturday".
-    text = re.sub(r"\b(ok|okay|yes|yeah|sure|then|maybe|probably|please|i think|let's say)\b", " ", text or "",
-                  flags=re.IGNORECASE)
-    text = " ".join(text.split()).strip(" ,.!")
-    label = choice_by_label(text, VISIT_TIMES)
-    if label:
-        return label
-    lower = text.lower()
-    if not was_asked and not re.search(r"\b(view|viewing|viewings|valuation|appointment|visit|free on|free at)\b", lower):
+    value = time_preference(text, was_asked, VISIT_TIMES, [
+        ("saturday", r"\b(saturdays?|sat|weekends?)\b"),
+        ("weekday_evening", r"\b(evenings?|after work|after [4-7]|[5-7] ?pm)\b"),
+        ("weekday_day", r"\b(mornings?|afternoons?|daytime|lunchtime|weekdays?|(mon|tues|wednes|thurs|fri)days?)\b"),
+    ], context=r"\b(view|viewing|viewings|valuation|appointment|visit|free on|free at)\b")
+    # "Clifton" or "£350k", typed when we asked for a time, answers a different question: ask again.
+    if value and value not in VISIT_TIMES and (match_area(value) or interest(value) or budget_band(value)):
         return None
-    for key, pattern in (("saturday", r"\b(saturdays?|sat|weekends?)\b"),
-                         ("weekday_evening", r"\b(evenings?|after work|after [4-7]|[5-7] ?pm)\b"),
-                         ("weekday_day", r"\b(mornings?|afternoons?|daytime|lunchtime|weekdays?|"
-                                         r"(mon|tues|wednes|thurs|fri)days?)\b")):
-        if re.search(pattern, lower):
-            # A named day and time ("Tuesday after 5") is more useful to the team than the band.
-            return _plain(text) if was_asked and len(text.split()) <= 8 and "?" not in text and len(text) > 12 else key
-    if was_asked and "?" not in text and len(text.split()) <= 8:
-        return _plain(text) or None
-    return None
+    return value
 
 
 def normalise_fields(raw: dict) -> dict:
@@ -292,11 +267,11 @@ def normalise_fields(raw: dict) -> dict:
             out[key] = raw[key]
     if raw.get("visit_time"):
         value = str(raw["visit_time"])
-        value = value if value in VISIT_TIMES else _plain(value)
+        value = value if value in VISIT_TIMES else plain(value)
         if value:
             out["visit_time"] = value
     if raw.get("area"):
-        area = _plain(raw["area"])
+        area = plain(raw["area"])
         if area:
             out["area"] = match_area(area) or area.title()
     return out
@@ -309,10 +284,10 @@ def rule_fields(message: str, asked: str | None) -> dict:
         found["phone"] = phone
     if email := parse_email(message):
         found["email"] = email
-    text = _PHONE.sub(" ", message)   # so a phone number is never read as a budget
+    text = UK_PHONE.sub(" ", message)   # so a phone number is never read as a budget
     name = parse_name(message, asked == "name")
     # "Fishponds" or "Thursday morning", typed while we wait for the name, is an answer to something else.
-    if name and not (match_area(name) == name or _DAY_OR_TIME.search(name)):
+    if name and not (match_area(name) == name or DAY_OR_TIME.search(name)):
         found["name"] = name
     if wants := interest(text):
         found["interest"] = wants

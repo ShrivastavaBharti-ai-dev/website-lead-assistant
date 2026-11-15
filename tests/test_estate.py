@@ -77,6 +77,7 @@ def test_move_in(text, asked, expected):
     ("Saturday", True, "saturday"), ("Weekday evening", True, "weekday_evening"), ("mornings", True, "weekday_day"),
     ("Tuesday after 5pm", True, "Tuesday after 5pm"), ("any time", True, "any time"),
     ("ok saturday then", True, "saturday"), ("Saturday morning", True, "Saturday morning"),
+    ("not mondays", True, "not mondays"), ("Clifton", True, None), ("350k", True, None),
     ("can I view it on Saturday?", False, "saturday"), ("I work evenings", False, None),
     ("=HYPERLINK(1)", True, "HYPERLINK(1)"),
 ])
