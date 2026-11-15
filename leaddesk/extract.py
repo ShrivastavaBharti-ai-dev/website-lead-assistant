@@ -61,15 +61,15 @@ class GeminiExtractor:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         self.profile = profile
-        # The question without its "Thanks, {name}!" opening, to remind the model what was asked.
-        self._question_text = {key: text.split("{name}")[-1] for key, (text, _) in profile.QUESTIONS.items()}
         self.model = model or os.getenv("GEMINI_CHAT_MODEL", DEFAULT_CHAT_MODEL)
         self.name = f"gemini:{self.model}"
         llm = ChatGoogleGenerativeAI(model=self.model, max_retries=2)
         self._chain = llm.with_structured_output(profile.EXTRACT_SCHEMA, method="json_schema")
 
     def extract(self, message: str, asked: str | None, lead: dict) -> dict:
-        human = (f"Assistant's last question: {self._question_text.get(asked, '(none)') if asked else '(none)'}\n"
+        # The question without its "Thanks, {name}!" opening, to remind the model what was asked.
+        last = self.profile.question(asked, lead)[0].split("{name}")[-1] if asked else "(none)"
+        human = (f"Assistant's last question: {last}\n"
                  f"Details already known: {json.dumps(lead, ensure_ascii=False)}\n\nVisitor message: {message}")
         raw = _with_backoff(lambda: self._chain.invoke([("system", self.profile.EXTRACT_PROMPT), ("human", human)]))
         raw = raw if isinstance(raw, dict) else {}

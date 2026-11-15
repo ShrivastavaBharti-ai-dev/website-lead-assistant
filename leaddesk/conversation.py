@@ -42,11 +42,11 @@ class Conversation:
         return Reply(self.profile.GREETING, self.profile.GREETING_CHOICES)
 
     def _next_field(self, session: Session) -> str | None:
-        return next((f for f in self.profile.REQUIRED if not session.lead.get(f)), None)
+        return next((f for f in self.profile.required(session.lead) if not session.lead.get(f)), None)
 
     def _ask(self, session: Session, field_name: str) -> tuple[str, list[str]]:
         session.asked = field_name
-        text, choices = self.profile.QUESTIONS[field_name]
+        text, choices = self.profile.question(field_name, session.lead)
         first = session.lead.get("name", "").split(" ")[0] or "there"
         return text.format(name=first), choices
 

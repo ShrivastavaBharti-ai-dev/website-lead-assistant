@@ -21,7 +21,7 @@ from docanswer import make_providers  # noqa: E402
 from docanswer.providers import OfflineAnswerModel, OfflineEmbedder  # noqa: E402
 from leaddesk import Conversation, GeminiExtractor, MemorySink, RulesExtractor, Session  # noqa: E402
 from leaddesk.faq import FaqAnswerer  # noqa: E402
-from leaddesk.fields import REQUIRED  # noqa: E402
+from leaddesk.profiles import interior as PROFILE  # noqa: E402
 
 README_START, README_END = "<!-- RESULTS:START -->", "<!-- RESULTS:END -->"
 
@@ -40,7 +40,7 @@ def run_setup(extractor, faq: FaqAnswerer, pause: float) -> dict:
     turns_to_finish, rows = [], []
     for conv in convs:
         sink = MemorySink()
-        chat, session = Conversation(extractor, faq, sink), Session()
+        chat, session = Conversation(PROFILE, extractor, faq, sink), Session()
         finished_at, temperature = None, None
         for n, message in enumerate(conv["messages"], 1):
             reply = chat.handle(session, message)
@@ -54,7 +54,7 @@ def run_setup(extractor, faq: FaqAnswerer, pause: float) -> dict:
         temp_hits += temperature == conv["temperature"]
         if finished_at:
             turns_to_finish.append(finished_at)
-        missing = [f for f in REQUIRED if not session.lead.get(f)]
+        missing = [f for f in PROFILE.required(session.lead) if not session.lead.get(f)]
         rows.append(f"| {conv['id']} | {hits}/{len(conv['expected'])} | {temperature or 'not finished'} "
                     f"(expected {conv['temperature']}) | {', '.join(missing) or '–'} |")
     faq_hits = refused_ok = answerable = unanswerable = 0
@@ -90,14 +90,14 @@ def main() -> None:
     except ImportError:
         pass
 
-    offline_faq = FaqAnswerer(OfflineEmbedder(), OfflineAnswerModel(), ROOT / "business", "Terracotta Lane Interiors")
-    setups = [("Rules only", RulesExtractor(), offline_faq, 0.0)]
+    offline_faq = FaqAnswerer(OfflineEmbedder(), OfflineAnswerModel(), PROFILE.DOCS, PROFILE.BUSINESS)
+    setups = [("Rules only", RulesExtractor(PROFILE), offline_faq, 0.0)]
     if not args.offline:
         embedder, model, live = make_providers()
         if live:
-            faq = FaqAnswerer(embedder, model, ROOT / "business", "Terracotta Lane Interiors",
+            faq = FaqAnswerer(embedder, model, PROFILE.DOCS, PROFILE.BUSINESS,
                               cache_path=ROOT / ".cache" / "embeddings.json")
-            extractor = GeminiExtractor()
+            extractor = GeminiExtractor(PROFILE)
             setups.append((f"Gemini (`{extractor.model}`)", extractor, faq, args.pause))
         else:
             print("No GOOGLE_API_KEY found: running rules only.\n")

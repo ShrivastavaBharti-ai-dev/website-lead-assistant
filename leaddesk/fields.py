@@ -26,12 +26,16 @@ _NAME_PATTERNS = [r"\bmy name is ([a-z][a-z .'-]{1,40})", r"\bthis is ([a-z][a-z
                   r"\b(?:i am|i'm|im) ([a-z][a-z'-]{1,20})(?=\s*[.,!])"]
 _NOT_NAMES = {"looking", "interested", "planning", "from", "in", "not", "here", "just", "a", "the", "fine", "ok",
               "okay", "i", "i'm", "im", "we", "we're", "yes", "no", "hi", "hello", "hey", "thanks", "sure", "need",
-              "want", "kitchen", "home", "flat", "house", "price", "cost", "what", "how", "is", "do", "can"}
+              "want", "what", "how", "is", "do", "can"}
+# Everyday words that are also surnames (Hannah Price, Tom House): not a name on their own or in first place.
+_NOT_FIRST_NAMES = {"kitchen", "home", "flat", "house", "price", "cost"}
 
 
 def clean_name(raw: str) -> str | None:
     words = [w for w in re.split(r"\s+", raw.strip(" .,!")) if w]
     if not 1 <= len(words) <= 4 or any(w.lower() in _NOT_NAMES for w in words):
+        return None
+    if words[0].lower() in _NOT_FIRST_NAMES:
         return None
     if not all(re.fullmatch(r"[A-Za-z.'-]+", w) for w in words):
         return None

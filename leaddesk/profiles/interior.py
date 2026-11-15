@@ -70,6 +70,15 @@ QUESTIONS = {
 }
 REQUIRED = list(QUESTIONS)
 
+
+def required(lead: dict) -> list[str]:
+    """The details to collect, in the order to ask. Every visitor gets the same questions here."""
+    return REQUIRED
+
+
+def question(field: str, lead: dict) -> tuple[str, list[str]]:
+    return QUESTIONS[field]
+
 SERVICE_AREAS = [
     "Baner", "Balewadi", "Aundh", "Pashan", "Wakad", "Hinjewadi", "Pimple Saudagar", "Kothrud", "Viman Nagar",
     "Kharadi", "Hadapsar", "Magarpatta", "Koregaon Park", "Kalyani Nagar", "Wagholi", "Undri", "NIBM",
