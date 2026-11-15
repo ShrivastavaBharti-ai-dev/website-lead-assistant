@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terracotta Lane Interiors (demo) · Website assistant by Bharti Shrivastava</title>
+<meta name="description" content="Demo website for a fictional Pune interior design studio, showing an AI assistant that answers questions and captures qualified leads.">
+<style>
+  :root { --clay: #B4552D; --clay-dark: #8E3F1E; --sand: #F6EFE7; --ink: #2B2420; --muted: #6E625A; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: #fff; line-height: 1.6; }
+  .demo { background: var(--ink); color: #f3e9df; font-size: 13px; text-align: center; padding: 8px 12px; }
+  .demo a { color: #F2B48F; }
+  nav { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto; padding: 18px 24px; }
+  .logo { font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; color: var(--clay-dark); letter-spacing: .3px; }
+  .logo span { color: var(--ink); font-weight: 400; }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 22px; font-size: 15px; }
+  .hero { background: linear-gradient(135deg, var(--sand) 0%, #F3DFCC 100%); }
+  .hero .wrap { max-width: 1100px; margin: 0 auto; padding: 72px 24px 80px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(34px, 5vw, 54px); line-height: 1.1; margin: 0 0 18px; }
+  .lead { font-size: 18px; color: var(--muted); margin: 0 0 28px; max-width: 520px; }
+  .btn { display: inline-block; background: var(--clay); color: #fff; border: 0; border-radius: 999px; padding: 14px 26px; font-size: 16px; cursor: pointer; text-decoration: none; }
+  .btn:hover { background: var(--clay-dark); }
+  .btn.ghost { background: transparent; color: var(--clay-dark); border: 1.5px solid var(--clay); margin-left: 10px; }
+  .art { aspect-ratio: 4 / 5; border-radius: 28px; background:
+      radial-gradient(circle at 30% 25%, #E9A47D 0 18%, transparent 19%),
+      linear-gradient(180deg, transparent 58%, #8E3F1E 58% 62%, transparent 62%),
+      linear-gradient(90deg, #D9B79B 0 45%, #C98B65 45% 47%, #E8D3BF 47%);
+    box-shadow: 0 30px 60px rgba(142, 63, 30, .25); }
+  section { max-width: 1100px; margin: 0 auto; padding: 64px 24px; }
+  h2 { font-family: Georgia, "Times New Roman", serif; font-size: 32px; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 32px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+  .card { background: var(--sand); border-radius: 18px; padding: 22px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .price { color: var(--clay-dark); font-weight: 600; margin-top: 10px !important; }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+  ol.steps li { counter-increment: s; border-top: 3px solid var(--clay); padding-top: 12px; font-size: 15px; }
+  ol.steps li::before { content: counter(s, decimal-leading-zero); display: block; font-family: Georgia, serif; color: var(--clay); font-size: 22px; }
+  .areas { display: flex; flex-wrap: wrap; gap: 8px; }
+  .areas span { background: #fff; border: 1px solid #E6D6C8; border-radius: 999px; padding: 6px 14px; font-size: 14px; }
+  .embed { background: var(--ink); color: #f3e9df; border-radius: 22px; padding: 36px; }
+  .embed h2 { color: #fff; }
+  .embed code { display: block; background: #3A302A; border-radius: 12px; padding: 14px; margin: 14px 0; font-size: 13px; overflow-x: auto; color: #F2B48F; white-space: pre; }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px 24px 120px; }
+  footer a { color: var(--clay-dark); }
+  @media (max-width: 800px) { .hero .wrap { grid-template-columns: 1fr; padding-top: 48px; } .art { display: none; } nav a { display: none; } }
+</style>
+</head>
+<body>
+<div class="demo">Demo website: Terracotta Lane Interiors is a fictional studio. The chat assistant (bottom right) is the real product. Built by <a href="https://contra.com/bharti_shrivastava_zu3hypce">Bharti Shrivastava</a>.</div>
+<nav>
+  <div class="logo">Terracotta Lane <span>Interiors</span></div>
+  <div><a href="#services">Services</a><a href="#process">Process</a><a href="#areas">Areas</a></div>
+</nav>
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Homes designed around the way you live.</h1>
+      <p class="lead">Full-home interiors, modular kitchens and wardrobes across Pune, designed by our studio on Baner Road and built in our own factory.</p>
+      <button class="btn" type="button" onclick="window.LeadDesk && window.LeadDesk.open()">Book a free consultation</button>
+      <a class="btn ghost" href="#services">See services</a>
+    </div>
+    <div class="art" role="img" aria-label="Abstract illustration of a warm living room"></div>
+  </div>
+</header>
+
+<section id="services">
+  <h2>What we design</h2>
+  <p class="sub">From one kitchen to a complete villa. Every quote is itemised after a free site measurement.</p>
+  <div class="grid">
+    <div class="card"><h3>Full-home interiors</h3><p>1 to 4 BHK apartments and villas, planned room by room.</p><p class="price">2 BHK usually ₹6–10 lakh</p></div>
+    <div class="card"><h3>Modular kitchens</h3><p>BWR plywood, soft-close hardware, 10-year warranty on units.</p><p class="price">From ₹2.5 lakh</p></div>
+    <div class="card"><h3>Wardrobes</h3><p>Sliding and hinged wardrobes with fitted interiors.</p><p class="price">From ₹1.2 lakh for two</p></div>
+    <div class="card"><h3>Offices and cafés</h3><p>Small workspaces, clinics and cafés up to 3,000 sq ft.</p><p class="price">Quoted per project</p></div>
+  </div>
+</section>
+
+<section id="process">
+  <h2>How a project works</h2>
+  <p class="sub">A kitchen takes 4–6 weeks after design sign-off; a 2 BHK home 8–10 weeks.</p>
+  <ol class="steps">
+    <li>Free 45-minute consultation</li><li>Free site measurement</li><li>3D designs, two rounds of changes</li>
+    <li>Itemised quote, 10% booking</li><li>Production and installation</li><li>Handover walkthrough</li>
+  </ol>
+</section>
+
+<section id="areas">
+  <h2>Where we work</h2>
+  <p class="sub">Projects across the Pune metropolitan region.</p>
+  <div class="areas">
+    <span>Baner</span><span>Balewadi</span><span>Aundh</span><span>Wakad</span><span>Hinjewadi</span><span>Kothrud</span>
+    <span>Viman Nagar</span><span>Kharadi</span><span>Hadapsar</span><span>Magarpatta</span><span>Koregaon Park</span>
+    <span>Kalyani Nagar</span><span>Wagholi</span><span>Undri</span><span>NIBM</span><span>Pimpri-Chinchwad</span>
+  </div>
+</section>
+
+<section>
+  <div class="embed">
+    <h2>Want this assistant on your website?</h2>
+    <p>It answers visitors' questions from your own documents, collects their details one question at a time, scores each lead as hot, warm or cold, adds it to your Google Sheet and emails you about the hot ones. Adding it to any website takes one line:</p>
+    <code>&lt;script src="https://your-server/widget.js" data-title="Your business" defer&gt;&lt;/script&gt;</code>
+    <a class="btn" href="https://contra.com/bharti_shrivastava_zu3hypce">Talk to Bharti on Contra</a>
+  </div>
+</section>
+
+<footer>Terracotta Lane Interiors is a fictional business created for this demo · Studio hours shown in the chat are made up · <a href="https://contra.com/bharti_shrivastava_zu3hypce">Bharti Shrivastava, AI automation engineer</a></footer>
+
+<script src="/widget.js" data-title="Terracotta Lane Interiors" data-color="#B4552D" defer></script>
+</body>
+</html>

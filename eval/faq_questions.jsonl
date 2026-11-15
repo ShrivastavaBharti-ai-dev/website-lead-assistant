@@ -1,0 +1,11 @@
+{"id": "F1", "question": "How much does a modular kitchen cost?", "answerable": true, "must_include": ["2.5 lakh"]}
+{"id": "F2", "question": "Do you work in Hinjewadi?", "answerable": true, "must_include": ["hinjewadi"]}
+{"id": "F3", "question": "How long does a 2 BHK full home take?", "answerable": true, "must_include": ["8-10 weeks"]}
+{"id": "F4", "question": "Is the first consultation free?", "answerable": true, "must_include": ["free"]}
+{"id": "F5", "question": "What is your design-only fee?", "answerable": true, "must_include": ["120"]}
+{"id": "F6", "question": "What's the payment schedule?", "answerable": true, "must_include": ["10%", "50%", "40%"]}
+{"id": "F7", "question": "Which days is the studio open?", "answerable": true, "must_include": ["tuesday"]}
+{"id": "F8", "question": "What warranty do you give on modular kitchens?", "answerable": true, "must_include": ["10"]}
+{"id": "F9", "question": "Do you take projects in Nashik?", "answerable": true, "must_include": ["pune"]}
+{"id": "F10", "question": "Do you sell sofas and curtains?", "answerable": false, "must_include": []}
+{"id": "F11", "question": "Do you offer EMI options?", "answerable": false, "must_include": []}
