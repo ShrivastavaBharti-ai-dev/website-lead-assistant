@@ -7,7 +7,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import pytest
 
 from leaddesk import CsvSink, LeadService, MemorySink, RateLimiter, SheetWebhookSink
-from leaddesk.sinks import HEADER, BackupSink, SinkError
+from leaddesk.sinks import BackupSink, SinkError, full_header
+
+HEADER = full_header(["Name", "Phone"])
 
 
 class FakeAppsScript(BaseHTTPRequestHandler):
@@ -45,7 +47,7 @@ def webhook():
 
 
 def test_webhook_follows_redirect_and_sends_token(webhook):
-    SheetWebhookSink(webhook, "secret").save(["a", "b"], {"subject": "Hot lead", "body": "x"})
+    SheetWebhookSink(webhook, "secret", HEADER).save(["a", "b"], {"subject": "Hot lead", "body": "x"})
     sent = FakeAppsScript.received[0]
     assert sent["token"] == "secret" and sent["rows"] == [["a", "b"]] and sent["header"] == HEADER
     assert sent["notify"]["subject"] == "Hot lead"
@@ -54,12 +56,12 @@ def test_webhook_follows_redirect_and_sends_token(webhook):
 def test_webhook_refusal_raises(webhook):
     FakeAppsScript.answer = {"ok": False, "error": "wrong token"}
     with pytest.raises(SinkError, match="wrong token"):
-        SheetWebhookSink(webhook, "bad").save(["a"], None)
+        SheetWebhookSink(webhook, "bad", HEADER).save(["a"], None)
 
 
 def test_backup_keeps_lead_when_sheet_fails(tmp_path):
-    backup = CsvSink(tmp_path / "leads.csv")
-    sink = BackupSink(SheetWebhookSink("http://127.0.0.1:9/exec", "t", timeout=1), backup)
+    backup = CsvSink(tmp_path / "leads.csv", HEADER)
+    sink = BackupSink(SheetWebhookSink("http://127.0.0.1:9/exec", "t", HEADER, timeout=1), backup)
     sink.save(["Priya", "+919822012345"], None)
     rows = list(csv.reader((tmp_path / "leads.csv").open(encoding="utf-8")))
     assert rows[0] == HEADER and rows[1] == ["Priya", "+919822012345"] and sink.last_error

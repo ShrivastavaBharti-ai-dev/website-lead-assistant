@@ -49,7 +49,8 @@ report(bool(key), f"GOOGLE_API_KEY found (ends in ...{key[-4:]})" if key else "G
 if key and problems == 0:
     try:
         from leaddesk import GeminiExtractor
-        found = GeminiExtractor().extract("I'm Rahul, need a kitchen in Baner, budget 5 lakh", None, {})
+        from leaddesk.profiles import interior
+        found = GeminiExtractor(interior).extract("I'm Rahul, need a kitchen in Baner, budget 5 lakh", None, {})
         report(found["fields"].get("project_type") == "kitchen", f"Gemini reads lead details: {found['fields']}")
     except Exception as error:  # noqa: BLE001
         report(False, f"Gemini call failed: {type(error).__name__}: {str(error)[:300]}",
@@ -58,7 +59,7 @@ if key and problems == 0:
         from docanswer import make_providers
         from leaddesk.faq import FaqAnswerer
         embedder, model, _ = make_providers(key)
-        answer = FaqAnswerer(embedder, model, ROOT / "business", "Terracotta Lane Interiors",
+        answer = FaqAnswerer(embedder, model, interior.DOCS, interior.BUSINESS,
                              cache_path=ROOT / ".cache" / "embeddings.json").answer("How much does a modular kitchen cost?")
         report(bool(answer), f"Gemini answers from the documents: {answer!r}"[:200])
     except Exception as error:  # noqa: BLE001
@@ -76,7 +77,7 @@ if url and token:
                "Check SHEETS_WEBHOOK_URL ends in /exec, SHEETS_TOKEN matches TOKEN in the script, "
                "and the deployment has 'Who has access: Anyone'.")
 else:
-    print("[ -- ] Google Sheet not set up yet (optional): leads are saved to leads/leads.csv")
+    print("[ -- ] Google Sheet not set up yet (optional): leads are saved to leads/interior.csv")
 
 print()
 print("All good. Next: uvicorn server.main:app --reload" if problems == 0 else f"{problems} problem(s) to fix above.")

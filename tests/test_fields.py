@@ -1,8 +1,8 @@
 """Parsers for phone numbers, budgets, timelines, areas and names, plus lead scoring."""
 import pytest
 
-from leaddesk import fields as F
-from leaddesk.qualify import qualify
+from leaddesk.profiles import interior as F
+from leaddesk.profiles.interior import qualify
 
 
 @pytest.mark.parametrize("text, expected", [

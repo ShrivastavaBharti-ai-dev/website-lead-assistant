@@ -14,8 +14,9 @@ import urllib.request
 from pathlib import Path
 from typing import Protocol
 
-HEADER = ["Received", "Name", "Phone", "Email", "Project", "Property", "Area", "In service area", "Budget",
-          "Timeline", "Lead", "Score", "Why", "Questions asked", "Page", "Session"]
+def full_header(lead_header: list[str]) -> list[str]:
+    """A profile's own lead columns, wrapped in the columns every lead row has."""
+    return ["Received", *lead_header, "Lead", "Score", "Why", "Questions asked", "Page", "Session"]
 
 
 class SinkError(RuntimeError):
@@ -38,8 +39,8 @@ class MemorySink:
 
 
 class CsvSink:
-    def __init__(self, path: str | Path):
-        self.path = Path(path)
+    def __init__(self, path: str | Path, header: list[str]):
+        self.path, self.header = Path(path), header
         self._lock = threading.Lock()
 
     def save(self, row: list, notify: dict | None) -> None:
@@ -49,18 +50,18 @@ class CsvSink:
             with self.path.open("a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 if new:
-                    writer.writerow(HEADER)
+                    writer.writerow(self.header)
                 writer.writerow(row)
 
 
 class SheetWebhookSink:
     """POST {token, tab, header, rows, notify} to the Apps Script web app."""
 
-    def __init__(self, url: str, token: str, tab: str = "Leads", timeout: float = 20.0):
-        self.url, self.token, self.tab, self.timeout = url, token, tab, timeout
+    def __init__(self, url: str, token: str, header: list[str], tab: str = "Leads", timeout: float = 20.0):
+        self.url, self.token, self.header, self.tab, self.timeout = url, token, header, tab, timeout
 
     def save(self, row: list, notify: dict | None) -> None:
-        payload = {"token": self.token, "tab": self.tab, "header": HEADER, "rows": [row], "notify": notify}
+        payload = {"token": self.token, "tab": self.tab, "header": self.header, "rows": [row], "notify": notify}
         request = urllib.request.Request(self.url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
                                          headers={"Content-Type": "application/json"}, method="POST")
         try:
@@ -93,8 +94,9 @@ class BackupSink:
             self.backup.save(row, notify)
 
 
-def make_sink(webhook_url: str | None, token: str | None, csv_path: str | Path) -> tuple[LeadSink, str]:
+def make_sink(webhook_url: str | None, token: str | None, csv_path: str | Path, header: list[str],
+              tab: str = "Leads") -> tuple[LeadSink, str]:
     """Returns (sink, description)."""
     if webhook_url and token:
-        return BackupSink(SheetWebhookSink(webhook_url, token), CsvSink(csv_path)), "Google Sheet"
-    return CsvSink(csv_path), "local CSV file"
+        return BackupSink(SheetWebhookSink(webhook_url, token, header, tab), CsvSink(csv_path, header)), "Google Sheet"
+    return CsvSink(csv_path, header), "local CSV file"

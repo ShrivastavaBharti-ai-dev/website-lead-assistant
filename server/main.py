@@ -29,8 +29,9 @@ except ImportError:
     pass
 
 from leaddesk import build_service  # noqa: E402  (after .env is loaded)
+from leaddesk.profiles import interior  # noqa: E402
 
-service = build_service()
+service = build_service(interior)
 app = FastAPI(title="LeadDesk", description="Website assistant that answers questions and captures leads.",
               version="1.0")
 origins = [o.strip() for o in (os.getenv("ALLOWED_ORIGINS") or "*").split(",") if o.strip()]

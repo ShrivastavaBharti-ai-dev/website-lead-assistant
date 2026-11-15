@@ -77,7 +77,7 @@ python scripts/check_setup.py
 uvicorn server.main:app --reload
 ```
 
-Open http://127.0.0.1:8000 for the demo website, or http://127.0.0.1:8000/docs for the API. Without a key the assistant uses rule-based parsing and shows the best-matching passage instead of a generated answer. Without a Google Sheet, leads go to `leads/leads.csv`.
+Open http://127.0.0.1:8000 for the demo website, or http://127.0.0.1:8000/docs for the API. Without a key the assistant uses rule-based parsing and shows the best-matching passage instead of a generated answer. Without a Google Sheet, leads go to `leads/interior.csv`.
 
 To send leads to a Google Sheet, follow the five steps at the top of `integrations/google_apps_script.gs`, then put the web app URL and token in `.env`.
 

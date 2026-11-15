@@ -3,27 +3,26 @@ import pytest
 
 from docanswer.providers import OfflineAnswerModel, OfflineEmbedder
 from leaddesk import Conversation, MemorySink, RulesExtractor, Session
-from leaddesk.conversation import OFFER
 from leaddesk.faq import FaqAnswerer
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
+from leaddesk.profiles import interior
+from leaddesk.profiles.interior import OFFER
 
 
 @pytest.fixture(scope="module")
 def faq():
-    return FaqAnswerer(OfflineEmbedder(), OfflineAnswerModel(), ROOT / "business", "Terracotta Lane Interiors")
+    return FaqAnswerer(OfflineEmbedder(), OfflineAnswerModel(), interior.DOCS, interior.BUSINESS)
 
 
 def talk(faq, messages):
     sink = MemorySink()
-    chat, session = Conversation(RulesExtractor(), faq, sink), Session()
+    chat, session = Conversation(interior, RulesExtractor(interior), faq, sink), Session()
     replies = [chat.handle(session, m) for m in messages]
     return session, replies, sink
 
 
-def test_greeting_has_choices():
-    assert len(Conversation.greet().quick_replies) == 3
+def test_greeting_has_choices(faq):
+    chat = Conversation(interior, RulesExtractor(interior), faq, MemorySink())
+    assert len(chat.greet().quick_replies) == 3
 
 
 def test_price_question_is_answered_then_offers_consultation(faq):

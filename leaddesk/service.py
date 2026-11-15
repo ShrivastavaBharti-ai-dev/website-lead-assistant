@@ -12,7 +12,7 @@ from pathlib import Path
 from .conversation import Conversation, Session
 from .extract import GeminiExtractor, RulesExtractor
 from .faq import FaqAnswerer
-from .sinks import make_sink
+from .sinks import full_header, make_sink
 
 ROOT = Path(__file__).resolve().parent.parent
 MAX_MESSAGE_CHARS = 500
@@ -43,8 +43,9 @@ class RateLimiter:
 
 class LeadService:
     def __init__(self, conversation: Conversation, mode: str, sink_name: str, max_sessions: int = 500,
-                 session_ttl: float = 2 * 3600, max_messages: int = 40, limiter: RateLimiter | None = None):
-        self.conversation, self.mode, self.sink_name = conversation, mode, sink_name
+                 session_ttl: float = 2 * 3600, max_messages: int = 40, limiter: RateLimiter | None = None,
+                 chat_end: str = "We've reached the end of this chat. Please contact the team directly."):
+        self.conversation, self.mode, self.sink_name, self.chat_end = conversation, mode, sink_name, chat_end
         self.max_sessions, self.session_ttl, self.max_messages = max_sessions, session_ttl, max_messages
         self.limiter = limiter or RateLimiter()
         self._sessions: dict[str, Session] = {}
@@ -80,8 +81,7 @@ class LeadService:
         if payload.get("page") and not session.page:
             session.page = str(payload["page"])[:300]
         if session.messages >= self.max_messages:
-            return 200, {"session_id": session.id, "reply": "We've reached the end of this chat. Please email "
-                         "hello@terracottalane.example and our team will help.", "quick_replies": [],
+            return 200, {"session_id": session.id, "reply": self.chat_end, "quick_replies": [],
                          "lead_complete": session.submitted}
         try:
             reply = self.conversation.handle(session, message)
@@ -98,15 +98,18 @@ class LeadService:
         return {"ok": True, "mode": self.mode, "leads_go_to": self.sink_name, "sessions": len(self._sessions)}
 
 
-def build_service(api_key: str | None = None) -> LeadService:
-    """Gemini when a key is set, otherwise offline rules."""
+def build_service(profile, api_key: str | None = None) -> LeadService:
+    """The assistant for one business profile. Gemini when a key is set, otherwise offline rules."""
     from docanswer import make_providers
 
     key = api_key or os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     embedder, answer_model, live = make_providers(key)
-    extractor = GeminiExtractor() if live else RulesExtractor()
-    faq = FaqAnswerer(embedder, answer_model, ROOT / "business", "Terracotta Lane Interiors",
+    extractor = GeminiExtractor(profile) if live else RulesExtractor(profile)
+    faq = FaqAnswerer(embedder, answer_model, profile.DOCS, profile.BUSINESS,
                       cache_path=ROOT / ".cache" / "embeddings.json")
-    sink, sink_name = make_sink(os.getenv("SHEETS_WEBHOOK_URL"), os.getenv("SHEETS_TOKEN"), ROOT / "leads" / "leads.csv")
+    # Each business gets its own CSV file and its own tab in the Google Sheet.
+    sink, sink_name = make_sink(os.getenv("SHEETS_WEBHOOK_URL"), os.getenv("SHEETS_TOKEN"),
+                                ROOT / "leads" / f"{profile.KEY}.csv", full_header(profile.LEAD_HEADER),
+                                tab=f"Leads - {profile.KEY}")
     mode = f"gemini ({extractor.model})" if live else "offline rules"
-    return LeadService(Conversation(extractor, faq, sink), mode, sink_name)
+    return LeadService(Conversation(profile, extractor, faq, sink), mode, sink_name, chat_end=profile.CHAT_END)
