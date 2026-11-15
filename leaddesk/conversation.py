@@ -79,7 +79,12 @@ class Conversation:
         if question:
             session.questions.append(question[:200])
             answer = self.faq.answer(question)
-            parts.append(answer or p.NOT_FOUND)
+            if answer:
+                parts.append(answer)
+            elif not (new or understood["wants_consultation"]):
+                parts.append(p.NOT_FOUND)
+            # Otherwise the visitor is giving details or asking to book ("could we see somewhere Saturday?"):
+            # carry on with that. The question is still passed to the team with the lead.
 
         if session.submitted:
             if not parts:

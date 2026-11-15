@@ -232,6 +232,31 @@ def test_a_day_or_a_treatment_is_not_taken_as_the_name():
     assert D.rule_fields("Grace Hall", "name")["name"] == "Grace Hall"
 
 
+class VagueQuestionExtractor:
+    """Like the AI on a message such as "I'd like to ask about braces, I'm Kate 07700 900808": details, plus
+    a 'question' the documents can't answer."""
+    name, live = "vague", True
+
+    def extract(self, message, asked, lead):
+        return {"fields": {"name": "Kate", "phone": "+447700900808", "patient_type": "new",
+                           "reason": "straightening", "visit_time": "weekday_afternoon"},
+                "question": "zzz qqq xxx", "wants_consultation": True, "declined": False}
+
+
+def test_an_unanswerable_question_inside_a_request_does_not_get_a_dont_know(faq):
+    faq_none = type("NoAnswer", (), {"answer": staticmethod(lambda q: None)})()
+    _, replies, sink = talk(faq_none, ["I'd like to ask about braces"], extractor=VagueQuestionExtractor())
+    assert replies[0].lead_complete and D.NOT_FOUND not in replies[0].text
+    assert "zzz qqq xxx" in sink.rows[0][COLUMN["Questions asked"]]
+    _, replies, _ = talk(faq_none, ["do you sell toothbrushes?"])
+    assert replies[0].text.startswith(D.NOT_FOUND)
+
+
+def test_a_time_from_the_ai_is_tidied_to_a_button_or_dropped():
+    assert D.normalise_fields({"visit_time": "weekday afternoon"}) == {"visit_time": "weekday_afternoon"}
+    assert D.normalise_fields({"visit_time": "whitening"}) == {}
+
+
 def test_a_price_question_does_not_start_taking_details(faq):
     session, replies, _ = talk(faq, ["how much is a hygienist appointment?"])
     assert "£72" in replies[0].text and not session.collecting and D.OFFER in replies[0].text

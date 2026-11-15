@@ -200,8 +200,7 @@ def normalise_fields(raw: dict) -> dict:
         if raw.get(key) in choices:
             out[key] = raw[key]
     if raw.get("visit_time"):
-        value = str(raw["visit_time"])
-        value = value if value in VISIT_TIMES else plain(value)
+        value = visit_time(str(raw["visit_time"]), True)   # a button, or their own words tidied up
         if value:
             out["visit_time"] = value
     return out
