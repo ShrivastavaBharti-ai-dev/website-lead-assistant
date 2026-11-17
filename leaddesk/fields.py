@@ -24,7 +24,7 @@ def choice_by_label(text: str, choices: dict[str, str]) -> str | None:
 
 _NAME_PATTERNS = [r"\bmy name is ([a-z][a-z .'-]{1,40})", r"\bthis is ([a-z][a-z .'-]{1,40})",
                   r"\bname\s*[:\-]\s*([a-z][a-z .'-]{1,40})", r"\bi am ([a-z][a-z.'-]{1,20})\s*$",
-                  r"\b(?:i am|i'm|im) ([a-z][a-z'-]{1,20})(?=\s*[.,!])"]
+                  r"\b(?:i am|i'm|im) ([a-z][a-z'-]{1,20}(?: [a-z][a-z'-]{1,20})?)(?=\s*[.,!])"]
 _NOT_NAMES = {"looking", "interested", "planning", "from", "in", "not", "here", "just", "a", "the", "fine", "ok",
               "okay", "i", "i'm", "im", "we", "we're", "yes", "no", "hi", "hello", "hey", "thanks", "sure", "need",
               "want", "what", "how", "is", "do", "can", "now", "today", "tomorrow", "asap", "please", "help",

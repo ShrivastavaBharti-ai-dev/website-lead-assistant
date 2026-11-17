@@ -219,6 +219,10 @@ def move_in(text: str, was_asked: bool = False) -> str | None:
     # "minimum tenancy 12 months?" is not a move-in date: outside our own question, require a word about moving.
     if not was_asked and not re.search(r"\b(move|moving|need (it|a place|somewhere)|start(ing)?)\b", lower):
         return None
+    # "Just looking for now" is not "now".
+    if re.search(r"\b(just looking|just browsing|no rush|not in a rush|next year|in the (spring|summer|autumn|winter)|"
+                 r"in a few months)\b", lower):
+        return "later"
     if re.search(r"\b(asap|immediately|right away|straight away|now|this month|next week|within a month|in a month|"
                  r"2 weeks|two weeks|urgent)\b", lower):
         return "within_1m"
@@ -285,8 +289,8 @@ def rule_fields(message: str, asked: str | None) -> dict:
         found["email"] = email
     text = UK_PHONE.sub(" ", message)   # so a phone number is never read as a budget
     name = parse_name(message, asked == "name")
-    # "Fishponds" or "Thursday morning", typed while we wait for the name, is an answer to something else.
-    if name and not (match_area(name) == name or DAY_OR_TIME.search(name)):
+    # "Fishponds", "Thursday morning" or "Buy", typed while we wait for the name, is an answer to something else.
+    if name and not (match_area(name) == name or DAY_OR_TIME.search(name) or interest(name)):
         found["name"] = name
     if wants := interest(text):
         found["interest"] = wants

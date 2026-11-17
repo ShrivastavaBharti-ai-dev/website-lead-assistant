@@ -37,7 +37,43 @@ Each finished chat becomes one row in the Google Sheet:
 ## Results
 
 <!-- RESULTS:START -->
-_Run `python eval/run_eval.py` with a Gemini key to fill in this table._
+Measured on 17 Nov 2026.
+
+**Harbour & Finch Estate Agents** (8 scripted visitor conversations and 12 questions)
+
+| | Rules only | Gemini (`gemini-3.5-flash-lite`) |
+|---|---:|---:|
+| Conversations that ended with a saved lead | 8/8 | 8/8 |
+| Lead details captured correctly | 49/49 | 48/49 |
+| Lead scored hot / warm / cold correctly | 8/8 | 8/8 |
+| Visitor messages per saved lead (average) | 5.9 | 5.9 |
+| Questions answered correctly from the documents | 7/9 | 9/9 |
+| Declined questions the documents don't cover | 0/3 | 3/3 |
+
+**Amberwick Dental** (8 scripted visitor conversations and 12 questions, plus 8 urgent and advice messages)
+
+| | Rules only | Gemini (`gemini-3.5-flash-lite`) |
+|---|---:|---:|
+| Conversations that ended with a saved lead | 8/8 | 8/8 |
+| Lead details captured correctly | 39/39 | 38/39 |
+| Lead scored hot / warm / cold correctly | 8/8 | 8/8 |
+| Visitor messages per saved lead (average) | 5.2 | 5.2 |
+| Questions answered correctly from the documents | 9/9 | 9/9 |
+| Declined questions the documents don't cover | 0/3 | 3/3 |
+| Urgent and advice messages given the fixed safe reply | 8/8 | 8/8 |
+
+**Terracotta Lane Interiors** (9 scripted visitor conversations and 11 questions)
+
+| | Rules only | Gemini (`gemini-3.5-flash-lite`) |
+|---|---:|---:|
+| Conversations that ended with a saved lead | 8/9 | 9/9 |
+| Lead details captured correctly | 52/53 | 52/53 |
+| Lead scored hot / warm / cold correctly | 8/9 | 9/9 |
+| Visitor messages per saved lead (average) | 6.6 | 6.4 |
+| Questions answered correctly from the documents | 8/9 | 8/9 |
+| Declined questions the documents don't cover | 0/2 | 2/2 |
+
+The rule-based parsers were written alongside these test conversations, so their scores are optimistic. In rules-only mode, questions are answered with the best-matching passage, which is why it never declines.
 <!-- RESULTS:END -->
 
 ## How it works

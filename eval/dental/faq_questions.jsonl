@@ -1,0 +1,12 @@
+{"id": "Q1", "question": "Do you take NHS patients?", "answerable": true, "must_include": ["private"]}
+{"id": "Q2", "question": "How much is a new patient examination?", "answerable": true, "must_include": ["65"]}
+{"id": "Q3", "question": "How much does teeth whitening cost?", "answerable": true, "must_include": ["350"]}
+{"id": "Q4", "question": "How much is a hygienist appointment?", "answerable": true, "must_include": ["72"]}
+{"id": "Q5", "question": "How much is the membership plan?", "answerable": true, "must_include": ["17.50"]}
+{"id": "Q6", "question": "Is there parking at the practice?", "answerable": true, "must_include": ["parking"]}
+{"id": "Q7", "question": "Do you offer sedation?", "answerable": true, "must_include": ["sedation"]}
+{"id": "Q8", "question": "What's the charge for a missed appointment?", "answerable": true, "must_include": ["30"]}
+{"id": "Q9", "question": "How much is an emergency appointment?", "answerable": true, "must_include": ["85"]}
+{"id": "Q10", "question": "Do any of your dentists speak Polish?", "answerable": false, "must_include": []}
+{"id": "Q11", "question": "Do you accept Bupa dental insurance?", "answerable": false, "must_include": []}
+{"id": "Q12", "question": "Can I bring my dog to my appointment?", "answerable": false, "must_include": []}

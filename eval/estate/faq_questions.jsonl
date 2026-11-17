@@ -1,0 +1,12 @@
+{"id": "Q1", "question": "What are your selling fees?", "answerable": true, "must_include": ["1.44%"]}
+{"id": "Q2", "question": "What deposit do tenants pay?", "answerable": true, "must_include": ["five weeks"]}
+{"id": "Q3", "question": "Are pets allowed at HF-L203?", "answerable": true, "must_include": ["cat"]}
+{"id": "Q4", "question": "How much is the Bishopston house for sale?", "answerable": true, "must_include": ["525,000"]}
+{"id": "Q5", "question": "How long is the lease on the Harbourside flat for sale?", "answerable": true, "must_include": ["118 years"]}
+{"id": "Q6", "question": "When can I move into the Harbourside flat to rent?", "answerable": true, "must_include": ["5 january 2027"]}
+{"id": "Q7", "question": "How much does an EPC cost?", "answerable": true, "must_include": ["95"]}
+{"id": "Q8", "question": "What's your phone number?", "answerable": true, "must_include": ["0117 496 0123"]}
+{"id": "Q9", "question": "What does full management cost for landlords?", "answerable": true, "must_include": ["12%"]}
+{"id": "Q10", "question": "Do you offer shared ownership homes?", "answerable": false, "must_include": []}
+{"id": "Q11", "question": "Can you recommend a removals company?", "answerable": false, "must_include": []}
+{"id": "Q12", "question": "What broadband speed does HF-S102 get?", "answerable": false, "must_include": []}

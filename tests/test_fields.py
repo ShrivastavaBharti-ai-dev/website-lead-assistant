@@ -81,3 +81,9 @@ def test_outside_area_is_cold_with_reason():
 def test_low_budget_for_full_home_is_flagged():
     result = qualify(lead(budget="3_6l"))
     assert any("low for a full home" in r for r in result.reasons)
+
+
+def test_a_two_word_name_after_i_am():
+    from leaddesk.fields import parse_name
+    assert parse_name("Hi, I'm Priya Shah. Looking to rent", False) == "Priya Shah"
+    assert parse_name("I'm not sure.", False) is None

@@ -50,8 +50,9 @@ URGENT_REPLY = ("That sounds like it may need urgent care. I'm an AI assistant a
 _URGENT = re.compile(
     r"\b(tooth ?ache|in (a lot of |so much |severe |terrible |real |constant )?pain|agony|severe pain|unbearable|"
     r"excruciating|throbbing|abscess|swelling|swelled|swollen|bleeding|bleeds|knocked[- ]out|"
-    r"knocked (a|my|his|her|their) tooth|(broken|broke|snapped|cracked) (a |my |his |her )?(tooth|teeth)|"
-    r"tooth (has |is )?(broken|broke|snapped|cracked|fell out|fallen out|came out|come out)|infection|infected|pus|"
+    r"knocked (a|my|his|her|their) tooth|(broken|broke|snapped|cracked|chipped) (a |my |his |her |their )?"
+    r"(front |back )?(tooth|teeth)|"
+    r"tooth (has |is )?(broken|broke|snapped|cracked|chipped|fell out|fallen out|came out|come out)|infection|infected|pus|"
     r"emergency|urgent|urgently|can'?t (breathe|swallow|sleep|eat|open my mouth))\b|"
     # Knocks, falls and injuries, however the sentence is put together ("knocked her front tooth out").
     r"\bknock\w*\b[^.?!]{0,40}\b(tooth|teeth)\b|\b(tooth|teeth)\b[^.?!]{0,40}\bknock\w*\b|"
@@ -134,7 +135,8 @@ def patient_type(text: str, was_asked: bool = False) -> str | None:
         return label
     lower = text.lower().replace("’", "'")
     if re.search(r"\b(new patients?|never been|first time|first visit|not registered|not a patient|"
-                 r"looking for a (new )?dentist|register|join)\b", lower):
+                 r"looking for a (new )?dentist|register|join)\b|"
+                 r"\b(not|never|haven'?t|have not) been (here |to you |to the practice )?before\b", lower):
         return "new"
     if re.search(r"\b(existing patient|already (a patient|registered|with you)|i'?m a patient|been (coming|with you)|"
                  r"my usual dentist|regular patient)\b", lower):

@@ -216,6 +216,12 @@ def test_an_area_or_a_day_is_not_taken_as_the_name():
     assert E.rule_fields("Clifton James", "name")["name"] == "Clifton James"
 
 
+def test_buy_rent_or_sell_typed_at_the_name_question_is_the_interest_not_the_name():
+    for answer, wanted in (("Buy", "buy"), ("Rent", "rent"), ("Sell my property", "sell"), ("Cash buyer", "buy")):
+        found = E.rule_fields(answer, "name")
+        assert "name" not in found and found["interest"] == wanted
+
+
 def test_landlord_asking_about_fees_then_wanting_a_valuation(faq):
     session, replies, sink = talk(faq, ["I'm a landlord with a flat in Bedminster, what are your fees?",
                                         "ok can someone come and value it", "Mark Ellis", "0117 496 0555",
@@ -250,3 +256,8 @@ def test_a_listing_is_found_by_its_code(faq):
 def test_documents_are_split_one_listing_per_passage(faq):
     listings = [c for c in faq.engine.chunks if "Property HF-" in c.text]
     assert len(listings) == 15 and all(c.text.count("Property HF-") == 1 for c in listings)
+
+
+def test_just_looking_for_now_is_later_not_now():
+    assert E.move_in("just looking for now, maybe in the summer", True) == "later"
+    assert E.move_in("we need to move now", False) == "within_1m"

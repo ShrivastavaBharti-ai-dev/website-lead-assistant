@@ -265,3 +265,13 @@ def test_a_price_question_does_not_start_taking_details(faq):
 def test_bad_phone_is_asked_again(faq):
     session, replies, _ = talk(faq, ["Request an appointment", "Farah", "12345"])
     assert "didn't quite get" in replies[-1].text and session.asked == "phone"
+
+
+def test_never_been_before_in_other_words_is_a_new_patient():
+    assert D.patient_type("its for me, ive not been before") == "new"
+    assert D.patient_type("I haven't been to the dentist in years") is None
+
+
+def test_a_chipped_or_broken_front_tooth_is_urgent():
+    for message in ("I chipped my front tooth on a crisp", "my son broke his front tooth"):
+        assert D.urgent(message)[0] == D.URGENT_REPLY
