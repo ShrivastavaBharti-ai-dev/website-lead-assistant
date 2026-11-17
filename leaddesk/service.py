@@ -98,7 +98,7 @@ class LeadService:
         return {"ok": True, "mode": self.mode, "leads_go_to": self.sink_name, "sessions": len(self._sessions)}
 
 
-def build_service(profile, api_key: str | None = None) -> LeadService:
+def build_service(profile, api_key: str | None = None, limiter: RateLimiter | None = None) -> LeadService:
     """The assistant for one business profile. Gemini when a key is set, otherwise offline rules."""
     from docanswer import make_providers
 
@@ -106,10 +106,11 @@ def build_service(profile, api_key: str | None = None) -> LeadService:
     embedder, answer_model, live = make_providers(key)
     extractor = GeminiExtractor(profile) if live else RulesExtractor(profile)
     faq = FaqAnswerer(embedder, answer_model, profile.DOCS, profile.BUSINESS,
-                      cache_path=ROOT / ".cache" / "embeddings.json")
+                      cache_path=ROOT / ".cache" / f"embeddings-{profile.KEY}.json")
     # Each business gets its own CSV file and its own tab in the Google Sheet.
     sink, sink_name = make_sink(os.getenv("SHEETS_WEBHOOK_URL"), os.getenv("SHEETS_TOKEN"),
                                 ROOT / "leads" / f"{profile.KEY}.csv", full_header(profile.LEAD_HEADER),
                                 tab=f"Leads - {profile.KEY}")
     mode = f"gemini ({extractor.model})" if live else "offline rules"
-    return LeadService(Conversation(profile, extractor, faq, sink), mode, sink_name, chat_end=profile.CHAT_END)
+    return LeadService(Conversation(profile, extractor, faq, sink), mode, sink_name,
+                       limiter=limiter, chat_end=profile.CHAT_END)

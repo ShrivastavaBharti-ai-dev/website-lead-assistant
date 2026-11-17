@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amberwick Dental (demo) | Website assistant by Bharti Shrivastava</title>
+<meta name="description" content="Demo website for a fictional private dental practice in Leeds, showing an AI assistant that answers patients' questions, takes appointment requests and points urgent problems to the phone.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1B2430; --pine: #1F5A4E; --sage: #E3EDE8; --amber: #C77C02; --muted: #5B6670; --line: #D5DFDA; --alert: #8F2D1D; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 300 17px/1.65 "Lexend", system-ui, sans-serif; color: var(--ink); background: #fff; }
+  strong, b { font-weight: 600; }
+  a { color: var(--pine); }
+  :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+  .demo { background: var(--ink); color: #E8EEEB; font-size: 14px; text-align: center; padding: 9px 16px; }
+  .demo a { color: #F2C46B; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+  .logo { font-weight: 600; font-size: 21px; color: var(--pine); }
+  .logo span { color: var(--amber); }
+  nav .links a { color: var(--muted); text-decoration: none; margin-left: 24px; font-size: 15px; }
+
+  .urgent { background: #FBEDEA; color: var(--alert); border-radius: 8px; padding: 12px 18px; font-size: 15px; }
+  .urgent a { color: var(--alert); font-weight: 600; }
+
+  .hero { display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; padding: 56px 0 24px; align-items: start; }
+  h1 { font-weight: 600; font-size: clamp(36px, 5vw, 56px); line-height: 1.08; letter-spacing: -1.4px; margin: 0 0 20px; }
+  .intro { font-size: 19px; color: var(--muted); max-width: 30em; margin: 0 0 28px; }
+  button, .btn { font: 400 16px "Lexend", system-ui, sans-serif; border-radius: 999px; padding: 13px 24px; cursor: pointer;
+                 border: 2px solid var(--pine); background: var(--pine); color: #fff; text-decoration: none; display: inline-block; }
+  button:hover, .btn:hover { background: var(--ink); border-color: var(--ink); }
+  .asks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .asks p { width: 100%; margin: 0; font-size: 15px; color: var(--muted); }
+  .asks button { background: #fff; color: var(--pine); border-color: var(--line); padding: 8px 16px; font-size: 15px; }
+  .asks button:hover { border-color: var(--pine); background: var(--sage); color: var(--ink); }
+
+  /* The opening-hours board: shows whether the practice is open right now (UK time). */
+  .hours { background: var(--sage); border-radius: 16px; padding: 28px; }
+  .status { font-size: 24px; font-weight: 600; margin: 0 0 2px; }
+  .status::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 10px;
+                    background: var(--muted); vertical-align: 2px; }
+  .status.open::before { background: #2E9E6A; box-shadow: 0 0 0 5px rgba(46,158,106,.2); }
+  .next { color: var(--muted); margin: 0 0 18px; font-size: 15px; }
+  .hours table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .hours td { padding: 7px 0; border-top: 1px solid var(--line); }
+  .hours td:last-child { text-align: right; }
+  .hours tr.today td { font-weight: 600; }
+  .hours .small { font-size: 14px; color: var(--muted); margin: 14px 0 0; }
+
+  section { padding: 72px 0 0; }
+  h2 { font-weight: 600; font-size: 32px; letter-spacing: -.6px; line-height: 1.2; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 28px; max-width: 42em; }
+  .prices { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
+  .prices div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .prices span:last-child { font-weight: 600; white-space: nowrap; }
+  .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }
+  .points h3 { font-weight: 600; font-size: 18px; margin: 0 0 4px; }
+  .points p { margin: 0; color: var(--muted); font-size: 15px; }
+  .pitch { margin-top: 88px; background: var(--pine); color: #fff; border-radius: 16px; padding: 44px; }
+  .pitch h2 { color: #fff; }
+  .pitch p { max-width: 44em; color: #D9E8E2; }
+  .pitch code { display: block; background: rgba(0,0,0,.22); border-radius: 8px; padding: 14px; margin: 18px 0 22px; font-size: 14px; overflow-x: auto; white-space: pre; color: #F2D9A6; }
+  .pitch .btn { background: #fff; color: var(--pine); border-color: #fff; }
+  footer { color: var(--muted); font-size: 14px; padding: 48px 0 120px; }
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; gap: 36px; padding-top: 36px; } .prices { grid-template-columns: 1fr; }
+    nav .links { display: none; } .pitch { padding: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="demo">Demo website: Amberwick Dental is a fictional practice, so please don't share real health details. The chat assistant (bottom right) is the real product. Built by <a href="https://contra.com/bharti_shrivastava_zu3hypce">Bharti Shrivastava</a>.</div>
+
+<div class="wrap">
+  <nav>
+    <div class="logo">Amberwick <span>Dental</span></div>
+    <div class="links"><a href="#fees">Fees</a><a href="#visit">Your visit</a><a href="#hours">Opening hours</a></div>
+  </nav>
+
+  <p class="urgent">In pain, or had an accident? Please phone <a href="tel:01134960456">0113 496 0456</a>. When we're closed, call NHS 111. For swelling that makes it hard to breathe or swallow, bleeding that won't stop, or an injury to your face or head, call 999 or go to A&amp;E.</p>
+
+  <header class="hero">
+    <div>
+      <h1>Private dentistry in Headingley, with Saturday mornings.</h1>
+      <p class="intro">Three dentists and two hygienists on Otley Road, Leeds. New patients are welcome, with no waiting list. Request an appointment here at any hour and reception will phone you to confirm it.</p>
+      <button type="button" onclick="window.LeadDesk && LeadDesk.ask('I\'d like to request an appointment')">Request an appointment</button>
+      <div class="asks">
+        <p>Or ask the assistant:</p>
+        <button type="button">Are you taking new patients?</button>
+        <button type="button">How much is a dental implant?</button>
+        <button type="button">I'm nervous about the dentist</button>
+        <button type="button">Do you see children?</button>
+      </div>
+    </div>
+
+    <aside class="hours" id="hours" aria-label="Opening hours">
+      <p class="status" id="status">Opening hours</p>
+      <p class="next" id="next">Phone 0113 496 0456</p>
+      <table>
+        <tr data-day="1"><td>Monday</td><td>8:30 am to 5:30 pm</td></tr>
+        <tr data-day="2"><td>Tuesday</td><td>8:30 am to 5:30 pm</td></tr>
+        <tr data-day="3"><td>Wednesday</td><td>8:30 am to 5:30 pm</td></tr>
+        <tr data-day="4"><td>Thursday</td><td>8:30 am to 5:30 pm</td></tr>
+        <tr data-day="5"><td>Friday</td><td>8:30 am to 4 pm</td></tr>
+        <tr data-day="6"><td>Saturday</td><td>9 am to 1 pm</td></tr>
+        <tr data-day="0"><td>Sunday</td><td>Closed</td></tr>
+      </table>
+      <p class="small">Closed on bank holidays. Emergency appointments are kept free every weekday morning.</p>
+    </aside>
+  </header>
+
+  <section id="fees">
+    <h2>Fees</h2>
+    <p class="sub">You always get a written treatment plan with the exact cost before treatment starts. Treatment over £500 can be spread over 12 months, interest-free.</p>
+    <div class="prices">
+      <div><span>New patient examination, with X-rays</span><span>£65</span></div>
+      <div><span>Routine examination</span><span>£48</span></div>
+      <div><span>Child's examination</span><span>£25</span></div>
+      <div><span>Hygienist, 30 minutes</span><span>£72</span></div>
+      <div><span>Emergency appointment</span><span>£85</span></div>
+      <div><span>White filling</span><span>from £120</span></div>
+      <div><span>Home teeth whitening</span><span>£350</span></div>
+      <div><span>Clear aligners</span><span>from £2,800</span></div>
+      <div><span>Dental implant with crown</span><span>from £2,600</span></div>
+      <div><span>Membership plan</span><span>£17.50 a month</span></div>
+    </div>
+  </section>
+
+  <section id="visit">
+    <h2>Your visit</h2>
+    <p class="sub">We are a private practice and don't offer NHS treatment.</p>
+    <div class="points">
+      <div><h3>Nervous patients</h3><p>Book a longer first appointment at no extra cost, agree a stop signal and take a break whenever you need one.</p></div>
+      <div><h3>Children</h3><p>We see children of all ages. Under-5s are seen free when a parent is a plan member.</p></div>
+      <div><h3>Getting here</h3><p>Step-free access, four parking spaces behind the building, and buses 1, 6 and 28 stop outside.</p></div>
+      <div><h3>Changing an appointment</h3><p>Please give us 48 hours' notice. Late cancellations and missed appointments are charged £30.</p></div>
+    </div>
+  </section>
+
+  <div class="pitch">
+    <h2>Want this assistant on your practice's website?</h2>
+    <p>It answers patients' questions from your own fee list and practice information, any hour of the day, and takes appointment requests for reception to confirm by phone. Urgent problems always get your phone number, NHS 111 and 999 guidance, never advice. New patients asking about implants, straightening or a problem are flagged for a call first, and every request lands in your Google Sheet. Adding it to your website takes one line:</p>
+    <code>&lt;script src="https://your-server/widget.js" data-business="your-practice" defer&gt;&lt;/script&gt;</code>
+    <a class="btn" href="https://contra.com/bharti_shrivastava_zu3hypce">Talk to Bharti on Contra</a>
+  </div>
+
+  <footer>Amberwick Dental is a fictional practice made for this demo. The fees, phone number and email address are not real, and nothing on this page is dental or medical advice. Built by <a href="https://contra.com/bharti_shrivastava_zu3hypce">Bharti Shrivastava, AI automation engineer</a>.</footer>
+</div>
+
+<script>
+  document.querySelectorAll(".asks button").forEach(function (button) {
+    button.addEventListener("click", function () { window.LeadDesk && LeadDesk.ask(button.textContent); });
+  });
+
+  // Open or closed right now, in UK time. Bank holidays are not known here, so the table says so.
+  (function () {
+    var HOURS = { 1: [510, 1050], 2: [510, 1050], 3: [510, 1050], 4: [510, 1050], 5: [510, 960], 6: [540, 780] };
+    var NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    function clock(m) {
+      var h = Math.floor(m / 60), min = m % 60, suffix = h < 12 ? "am" : "pm";
+      h = h % 12 || 12;
+      return h + (min ? ":" + String(min).padStart(2, "0") : "") + " " + suffix;
+    }
+    var parts = {};
+    new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23" })
+      .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+    var day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+    var now = Number(parts.hour) * 60 + Number(parts.minute);
+    var today = HOURS[day];
+    var row = document.querySelector('tr[data-day="' + day + '"]');
+    if (row) row.className = "today";
+    var status = document.getElementById("status"), next = document.getElementById("next");
+    if (today && now >= today[0] && now < today[1]) {
+      status.textContent = "Open now";
+      status.className = "status open";
+      next.textContent = "Until " + clock(today[1]) + " today. Phone 0113 496 0456.";
+    } else {
+      status.textContent = "Closed now";
+      status.className = "status";
+      for (var i = 0; i < 8; i++) {
+        var d = (day + i) % 7, h = HOURS[d];
+        if (h && (i > 0 || now < h[0])) {
+          next.textContent = "Opens " + (i === 0 ? "today" : i === 1 ? "tomorrow" : NAMES[d]) + " at " + clock(h[0]) + ".";
+          break;
+        }
+      }
+    }
+  })();
+</script>
+<script src="/widget.js" data-business="dental" data-title="Amberwick Dental" data-color="#1F5A4E"
+        data-note="AI assistant, not a dentist. Please don't type medical details." defer></script>
+</body>
+</html>

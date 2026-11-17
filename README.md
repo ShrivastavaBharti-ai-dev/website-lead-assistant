@@ -15,7 +15,13 @@ LeadDesk answers the questions that make people hesitate (prices, areas served, 
 
 ## Try it
 
-The demo website belongs to **Terracotta Lane Interiors**, a *fictional* interior design studio in Pune. Open the chat bubble and try:
+There are three demo websites, each for a *fictional* business with its own documents, questions and lead scoring:
+
+- **`/estate`: Harbour & Finch, a Bristol estate agency.** Press "Ask about this home" on any listing, book a viewing as a buyer (it asks about budget, mortgage and chain) or ask for a valuation. Sellers and landlords are always hot leads.
+- **`/dental`: Amberwick Dental, a private practice in Leeds.** Ask about fees or nervous patients, or request an appointment. Mention pain or an accident and it gives the practice phone number, NHS 111 and 999 guidance instead of advice, every time.
+- **`/`: Terracotta Lane Interiors**, described below.
+
+The interior studio site belongs to **Terracotta Lane Interiors**, a *fictional* interior design studio in Pune. Open the chat bubble and try:
 
 - "How much does a 2 BHK cost?", then **Book a free consultation**
 - Everything in one message: *"Hi, I'm Sneha. We need a modular kitchen in Kothrud, budget around 4 lakh, starting within a month. My number is 91234 56789"*
@@ -57,7 +63,7 @@ flowchart LR
 - **One line to embed:** the widget is a single dependency-free script with its own styles, so it never clashes with the host website.
 
 ```html
-<script src="https://your-server/widget.js" data-title="Your business" data-color="#B4552D" defer></script>
+<script src="https://your-server/widget.js" data-business="estate" data-title="Your business" data-color="#B4552D" defer></script>
 ```
 
 Built with **FastAPI**, **LangChain** and **Gemini**, plain **JavaScript** for the widget, and a **Google Apps Script** webhook for the Sheet and email alerts. Hosted free on Render.
@@ -89,9 +95,9 @@ python eval/run_eval.py   # rules vs Gemini on scripted conversations
 ## Project structure
 
 ```
-server/main.py              FastAPI: /api/chat, /api/greeting, /api/health, /widget.js, demo site
+server/main.py              FastAPI: /api/<business>/chat|greeting|health, /widget.js, demo sites
 static/widget.js            the embeddable chat bubble (no dependencies)
-static/index.html           the fictional studio's demo website
+static/*.html               demo websites: index (interior studio), estate, dental
 leaddesk/
   conversation.py           the chat flow: answer, ask, submit
   extract.py                Gemini structured extraction + rule-based fallback

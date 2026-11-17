@@ -1,4 +1,7 @@
-"""Web server: the chat API, the embeddable widget and the demo website.
+"""Web server: the chat API, the embeddable widget and one demo website per business.
+
+Pages: / (interior studio), /estate, /dental. Each business has its own API under
+/api/<business>/...; the plain /api/... paths are the interior studio, kept for older embeds.
 
     uvicorn server.main:app --reload
 
@@ -13,7 +16,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
@@ -29,11 +32,17 @@ except ImportError:
     pass
 
 from leaddesk import build_service  # noqa: E402  (after .env is loaded)
-from leaddesk.profiles import interior  # noqa: E402
+from leaddesk.profiles import dental, estate, interior  # noqa: E402
+from leaddesk.service import RateLimiter  # noqa: E402
 
-service = build_service(interior)
+# One limiter for all businesses, so a visitor can't triple their allowance by switching demos.
+limiter = RateLimiter()
+services = {p.KEY: build_service(p, limiter=limiter) for p in (interior, estate, dental)}
+service = services[interior.KEY]
+PAGES = {interior.KEY: "index.html", estate.KEY: "estate.html", dental.KEY: "dental.html"}
+
 app = FastAPI(title="LeadDesk", description="Website assistant that answers questions and captures leads.",
-              version="1.0")
+              version="1.1")
 origins = [o.strip() for o in (os.getenv("ALLOWED_ORIGINS") or "*").split(",") if o.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"],
                    allow_headers=["Content-Type"])
@@ -52,20 +61,29 @@ def client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+def service_for(business: str):
+    if business not in services:
+        raise HTTPException(404, "Unknown business.")
+    return services[business]
+
+
 @app.post("/api/chat")
-def chat(body: ChatIn, request: Request) -> JSONResponse:
-    status, payload = service.chat(body.model_dump(), client_ip(request))
+@app.post("/api/{business}/chat")
+def chat(body: ChatIn, request: Request, business: str = interior.KEY) -> JSONResponse:
+    status, payload = service_for(business).chat(body.model_dump(), client_ip(request))
     return JSONResponse(payload, status_code=status)
 
 
 @app.get("/api/greeting")
-def greeting() -> dict:
-    return service.greeting()
+@app.get("/api/{business}/greeting")
+def greeting(business: str = interior.KEY) -> dict:
+    return service_for(business).greeting()
 
 
 @app.get("/api/health")
-def health() -> dict:
-    return service.health()
+@app.get("/api/{business}/health")
+def health(business: str = interior.KEY) -> dict:
+    return service_for(business).health()
 
 
 @app.get("/widget.js", include_in_schema=False)
@@ -75,5 +93,8 @@ def widget() -> FileResponse:
 
 
 @app.get("/", include_in_schema=False)
-def demo_site() -> FileResponse:
-    return FileResponse(STATIC / "index.html", media_type="text/html")
+@app.get("/{business}", include_in_schema=False)
+def demo_site(business: str = interior.KEY) -> FileResponse:
+    if business not in PAGES:
+        raise HTTPException(404, "Page not found.")
+    return FileResponse(STATIC / PAGES[business], media_type="text/html")

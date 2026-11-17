@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbour &amp; Finch Estate Agents (demo) | Website assistant by Bharti Shrivastava</title>
+<meta name="description" content="Demo website for a fictional Bristol estate agency, showing an AI assistant that answers buyers, tenants, sellers and landlords and books viewings and valuations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #14202B; --harbour: #1F4E6B; --gold: #E9A23B; --mist: #EEF2F4; --muted: #56646F; --line: #D7DEE3;
+          --pink: #EBB2A3; --mint: #A3CCC4; --lemon: #F0D27E; --sky: #AEBDE3; --peach: #E6A178; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 17px/1.6 "Archivo", system-ui, sans-serif; color: var(--ink); background: #fff; }
+  a { color: var(--harbour); }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .demo { background: var(--ink); color: #E6EDF2; font-size: 14px; text-align: center; padding: 9px 16px; }
+  .demo a { color: var(--gold); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+  .logo { font-weight: 800; font-size: 22px; letter-spacing: -.5px; }
+  .logo b { color: var(--gold); }
+  nav .links a { color: var(--muted); text-decoration: none; margin-left: 24px; font-size: 15px; }
+  nav .links a:hover { color: var(--ink); }
+
+  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end; padding: 40px 0 0; }
+  h1 { font-size: clamp(38px, 5.4vw, 62px); line-height: 1.02; letter-spacing: -1.8px; font-weight: 800; margin: 0 0 20px; }
+  .intro { color: var(--muted); font-size: 19px; max-width: 30em; margin: 0 0 28px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 56px; }
+  button, .btn { font: 600 16px "Archivo", system-ui, sans-serif; border-radius: 6px; padding: 14px 22px; cursor: pointer;
+                 border: 2px solid var(--harbour); background: var(--harbour); color: #fff; text-decoration: none; }
+  button:hover, .btn:hover { background: var(--ink); border-color: var(--ink); }
+  button.quiet { background: #fff; color: var(--harbour); }
+  button.quiet:hover { background: var(--mist); color: var(--ink); }
+
+  /* A row of Bristol painted terraces: the one decorative moment on the page. */
+  .street { display: flex; align-items: flex-end; height: 300px; }
+  .house { flex: 1; position: relative; border-right: 2px solid #fff; }
+  .house::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 34px;
+                   background: inherit; filter: brightness(.86); clip-path: polygon(0 100%, 50% 0, 100% 100%); }
+  .house i { position: absolute; width: 26%; height: 15%; background: #fff; border: 3px solid rgba(20,32,43,.18); }
+  .house i:nth-child(1) { left: 16%; top: 14%; } .house i:nth-child(2) { right: 16%; top: 14%; }
+  .house i:nth-child(3) { left: 16%; top: 42%; } .house i:nth-child(4) { right: 16%; top: 42%; }
+  .house i.door { left: 37%; width: 26%; height: 26%; bottom: 0; top: auto; background: var(--ink); border: 0; border-radius: 40px 40px 0 0; }
+  .h1 { height: 78%; background: var(--pink); } .h2 { height: 88%; background: var(--mint); }
+  .h3 { height: 72%; background: var(--lemon); } .h4 { height: 84%; background: var(--sky); } .h5 { height: 76%; background: var(--peach); }
+  .pavement { height: 14px; background: var(--ink); }
+
+  section { padding: 72px 0 0; }
+  h2 { font-size: 34px; letter-spacing: -.8px; line-height: 1.15; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 28px; max-width: 42em; }
+  .listings { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 28px 22px; }
+  .listing { border-top: 6px solid var(--c); padding-top: 14px; display: flex; flex-direction: column; }
+  .listing .price { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+  .listing .price small { font-size: 15px; font-weight: 400; color: var(--muted); }
+  .listing h3 { font-size: 17px; font-weight: 600; margin: 2px 0 4px; }
+  .listing p { margin: 0 0 14px; color: var(--muted); font-size: 15px; flex: 1; }
+  .listing button { padding: 9px 14px; font-size: 15px; align-self: flex-start; }
+  .ref { font-size: 13px; color: var(--muted); }
+
+  .valuation { margin-top: 80px; background: var(--harbour); color: #fff; border-radius: 10px; padding: 44px;
+               display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center; }
+  .valuation h2 { color: #fff; }
+  .valuation p { margin: 0; color: #D5E3EC; }
+  .valuation button { background: var(--gold); border-color: var(--gold); color: var(--ink); justify-self: start; }
+  .valuation button:hover { background: #fff; border-color: #fff; }
+  .fees { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; }
+  .fees div { border-left: 3px solid var(--line); padding-left: 16px; }
+  .fees h3 { font-size: 17px; margin: 0 0 4px; }
+  .fees p { margin: 0; color: var(--muted); font-size: 15px; }
+  .pitch { margin-top: 88px; border: 2px solid var(--ink); border-radius: 10px; padding: 40px; }
+  .pitch p { max-width: 44em; color: var(--muted); }
+  .pitch code { display: block; background: var(--mist); border-radius: 6px; padding: 14px; margin: 18px 0 22px; font-size: 14px; overflow-x: auto; white-space: pre; }
+  footer { color: var(--muted); font-size: 14px; padding: 48px 0 120px; }
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; gap: 0; } .street { height: 170px; } .actions { margin-bottom: 40px; }
+    nav .links { display: none; } .valuation { grid-template-columns: 1fr; padding: 30px; } .pitch { padding: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="demo">Demo website: Harbour &amp; Finch is a fictional Bristol agency and none of these homes exist. The chat assistant (bottom right) is the real product. Built by <a href="https://contra.com/bharti_shrivastava_zu3hypce">Bharti Shrivastava</a>.</div>
+
+<div class="wrap">
+  <nav>
+    <div class="logo">Harbour <b>&amp;</b> Finch</div>
+    <div class="links"><a href="#sale">For sale</a><a href="#rent">To rent</a><a href="#valuation">Valuations</a><a href="#fees">Fees</a></div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <h1>Bristol homes to buy, rent, sell and let.</h1>
+      <p class="intro">An independent agency on Whiteladies Road, covering Clifton to Fishponds. Ask our assistant about any home below, any time of day, and book a viewing in a few messages.</p>
+      <div class="actions">
+        <button type="button" onclick="window.LeadDesk && LeadDesk.ask('I\'d like to book a viewing')">Book a viewing</button>
+        <button type="button" class="quiet" onclick="window.LeadDesk && LeadDesk.ask('What is my house worth?')">Value my home</button>
+      </div>
+    </div>
+    <div aria-hidden="true">
+      <div class="street">
+        <div class="house h1"><i></i><i></i><i></i><i></i><i class="door"></i></div>
+        <div class="house h2"><i></i><i></i><i></i><i></i><i class="door"></i></div>
+        <div class="house h3"><i></i><i></i><i></i><i></i><i class="door"></i></div>
+        <div class="house h4"><i></i><i></i><i></i><i></i><i class="door"></i></div>
+        <div class="house h5"><i></i><i></i><i></i><i></i><i class="door"></i></div>
+      </div>
+      <div class="pavement"></div>
+    </div>
+  </header>
+
+  <section id="sale">
+    <h2>For sale</h2>
+    <p class="sub">Asking prices. Every viewing is accompanied by one of our team.</p>
+    <div class="listings" data-kind="sale">
+      <article class="listing" style="--c: var(--pink)"><div class="price">£365,000</div><h3>2-bedroom flat, Clifton</h3><p>Period first-floor flat on Pembroke Road with high ceilings. No onward chain.</p><button type="button" data-ref="HF-S101">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--mint)"><div class="price">£525,000</div><h3>3-bedroom terrace, Bishopston</h3><p>Victorian house on Egerton Road with a south-facing garden and loft potential.</p><button type="button" data-ref="HF-S102">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--lemon)"><div class="price">£245,000</div><h3>1-bedroom flat, Harbourside</h3><p>Third floor with a balcony, lift and parking space. Ideal first home.</p><button type="button" data-ref="HF-S103">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--sky)"><div class="price">£795,000</div><h3>4-bedroom detached, Westbury-on-Trym</h3><p>Family house on Falcondale Road with a driveway, garage and 20-metre garden.</p><button type="button" data-ref="HF-S104">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--peach)"><div class="price">£340,000</div><h3>2-bedroom terrace, Totterdown</h3><p>Courtyard garden, ten minutes' walk from Temple Meads. No onward chain.</p><button type="button" data-ref="HF-S105">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--mint)"><div class="price">£415,000</div><h3>3-bedroom semi, Horfield</h3><p>1930s house with a driveway and garden. Needs some modernisation.</p><button type="button" data-ref="HF-S106">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--lemon)"><div class="price">£289,950</div><h3>2-bedroom flat, Southville</h3><p>Ground floor with a private garden and share of the freehold, near North Street.</p><button type="button" data-ref="HF-S107">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--pink)"><div class="price">£1,150,000</div><h3>5-bedroom townhouse, Redland</h3><p>Victorian house over four floors with a cellar and walled garden.</p><button type="button" data-ref="HF-S108">Ask about this home</button></article>
+    </div>
+  </section>
+
+  <section id="rent">
+    <h2>To rent</h2>
+    <p class="sub">Rents are per calendar month. Tenants pay no agency fees.</p>
+    <div class="listings">
+      <article class="listing" style="--c: var(--sky)"><div class="price">£1,150 <small>pcm</small></div><h3>1-bedroom flat, Clifton</h3><p>Furnished, on Alma Vale Road. Available now.</p><button type="button" data-ref="HF-L201">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--peach)"><div class="price">£1,650 <small>pcm</small></div><h3>2-bedroom flat, Harbourside</h3><p>Two bathrooms, balcony and parking. From 5 January 2027.</p><button type="button" data-ref="HF-L202">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--mint)"><div class="price">£2,100 <small>pcm</small></div><h3>3-bedroom house, Bishopston</h3><p>Family house with a garden. Pets considered. From 19 December 2026.</p><button type="button" data-ref="HF-L203">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--lemon)"><div class="price">£895 <small>pcm</small></div><h3>Studio flat, Cotham</h3><p>Furnished, water included. Available now.</p><button type="button" data-ref="HF-L204">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--pink)"><div class="price">£1,450 <small>pcm</small></div><h3>2-bedroom house, Bedminster</h3><p>Courtyard garden on Chessel Street. From 12 December 2026.</p><button type="button" data-ref="HF-L205">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--sky)"><div class="price">£2,800 <small>pcm</small></div><h3>4-bedroom house, Redland</h3><p>For a family or four professional sharers. From 9 January 2027.</p><button type="button" data-ref="HF-L206">Ask about this home</button></article>
+      <article class="listing" style="--c: var(--peach)"><div class="price">£975 <small>pcm</small></div><h3>1-bedroom flat, Easton</h3><p>Ground floor with a shared garden. Available now.</p><button type="button" data-ref="HF-L207">Ask about this home</button></article>
+    </div>
+  </section>
+
+  <div class="valuation" id="valuation">
+    <div>
+      <h2>Thinking of selling or letting?</h2>
+      <p>Our valuer visits for about 45 minutes and sends a written valuation within two working days. Free, with no obligation.</p>
+    </div>
+    <button type="button" onclick="window.LeadDesk && LeadDesk.ask('I\'d like a free valuation')">Book a free valuation</button>
+  </div>
+
+  <section id="fees">
+    <h2>Our fees</h2>
+    <p class="sub">Buyers and tenants pay us nothing.</p>
+    <div class="fees">
+      <div><h3>Selling</h3><p>1.44% of the sale price including VAT, minimum £2,400. No sale, no fee.</p></div>
+      <div><h3>Let only</h3><p>60% of the first month's rent including VAT.</p></div>
+      <div><h3>Full management</h3><p>12% of the monthly rent including VAT, plus a £360 set-up fee.</p></div>
+      <div><h3>Opening hours</h3><p>Monday to Friday 9 am to 6 pm, Saturday 9 am to 4 pm. Phone 0117 496 0123.</p></div>
+    </div>
+  </section>
+
+  <div class="pitch">
+    <h2>Want this assistant on your agency's website?</h2>
+    <p>Try it on the listings above. It answers questions from your own listings and fee guide, any hour of the day. It books viewings and valuations one question at a time and asks buyers about their budget, mortgage and chain. Sellers and landlords are flagged as hot leads, and every enquiry lands in your Google Sheet with an email for the hot ones. Adding it to your website takes one line:</p>
+    <code>&lt;script src="https://your-server/widget.js" data-business="your-agency" defer&gt;&lt;/script&gt;</code>
+    <a class="btn" href="https://contra.com/bharti_shrivastava_zu3hypce">Talk to Bharti on Contra</a>
+  </div>
+
+  <footer>Harbour &amp; Finch Estate Agents is a fictional business made for this demo. The listings, phone number and email address are not real. Built by <a href="https://contra.com/bharti_shrivastava_zu3hypce">Bharti Shrivastava, AI automation engineer</a>.</footer>
+</div>
+
+<script>
+  document.querySelectorAll("[data-ref]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      window.LeadDesk && LeadDesk.ask("Tell me about " + button.dataset.ref);
+    });
+  });
+</script>
+<script src="/widget.js" data-business="estate" data-title="Harbour &amp; Finch" data-color="#1F4E6B" defer></script>
+</body>
+</html>

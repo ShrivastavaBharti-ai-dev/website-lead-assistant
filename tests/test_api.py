@@ -49,3 +49,27 @@ def test_cors_allows_embedding(client):
     response = client.options("/api/chat", headers={"Origin": "https://example.com",
                                                     "Access-Control-Request-Method": "POST"})
     assert response.status_code == 200
+
+
+def test_each_business_has_its_own_page_and_assistant(client):
+    for business, name in (("estate", "Harbour & Finch"), ("dental", "Amberwick Dental")):
+        assert client.get(f"/{business}").status_code == 200
+        assert name in client.get(f"/api/{business}/greeting").json()["reply"]
+        assert client.get(f"/api/{business}/health").json()["ok"] is True
+    assert client.get("/nowhere").status_code == 404
+    assert client.get("/api/nowhere/greeting").status_code == 404
+    assert client.post("/api/nowhere/chat", json={"message": "hi"}).status_code == 404
+
+
+def test_dental_urgent_reply_over_http(client):
+    from server.main import services
+    from leaddesk import MemorySink
+    services["dental"].conversation.sink = MemorySink()
+    reply = client.post("/api/dental/chat", json={"message": "my tooth got knocked out"}).json()["reply"]
+    assert "0113 496 0456" in reply and "111" in reply
+
+
+def test_one_rate_limit_across_businesses():
+    from server.main import services
+    limiters = {id(s.limiter) for s in services.values()}
+    assert len(limiters) == 1

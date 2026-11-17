@@ -1,6 +1,8 @@
 /*!
  * LeadDesk chat widget. Add to any website with one line:
- *   <script src="https://YOUR-SERVER/widget.js" data-title="Terracotta Lane" data-color="#B4552D" defer></script>
+ *   <script src="https://YOUR-SERVER/widget.js" data-business="estate" data-title="Harbour & Finch" defer></script>
+ * Optional: data-color, data-note (small line under the input), data-api (server address).
+ * The page can call LeadDesk.open() or LeadDesk.ask("question") from its own buttons.
  * No dependencies. Styles live in a shadow root, so they never clash with the host page.
  */
 (function () {
@@ -12,7 +14,11 @@
   var API = ((script && script.getAttribute("data-api")) || new URL(src, location.href).origin).replace(/\/$/, "");
   var TITLE = (script && script.getAttribute("data-title")) || "Chat with us";
   var COLOR = (script && script.getAttribute("data-color")) || "#B4552D";
-  var KEY = "leaddesk:" + API;
+  var NOTE = (script && script.getAttribute("data-note")) || "AI assistant: answers come from our own documents.";
+  var BUSINESS = script && script.getAttribute("data-business");
+  var BASE = API + (BUSINESS ? "/api/" + encodeURIComponent(BUSINESS) : "/api");
+  var KEY = "leaddesk:" + BASE;
+  var pending = null;  // a question asked with LeadDesk.ask() before the greeting arrived
 
   function load() {
     try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
@@ -112,7 +118,7 @@
   }
 
   function request(path, body) {
-    return fetch(API + path, body ? {
+    return fetch(BASE + path, body ? {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
     } : undefined).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (data) { return { ok: res.ok, data: data }; });
@@ -127,7 +133,7 @@
     setChips([]);
     input.value = "";
     setBusy(true);
-    request("/api/chat", { message: text, session_id: state.session_id || null, page: location.href.slice(0, 300) })
+    request("/chat", { message: text, session_id: state.session_id || null, page: location.href.slice(0, 300) })
       .then(function (r) {
         setBusy(false);
         if (r.data.session_id) { state.session_id = r.data.session_id; save(state); }
@@ -138,6 +144,7 @@
           addMessage("err", r.data.error || "Sorry, something went wrong. Please try again.");
         }
         input.focus();
+        flush();
       })
       .catch(function () {
         setBusy(false);
@@ -145,16 +152,22 @@
       });
   }
 
+  function flush() {
+    if (pending && !busy) { var text = pending; pending = null; send(text); }
+  }
+
   function greet() {
-    if (state.messages.length) return;
+    if (state.messages.length || busy) return flush();
     setBusy(true);
-    request("/api/greeting").then(function (r) {
+    request("/greeting").then(function (r) {
       setBusy(false);
       addMessage("bot", (r.data && r.data.reply) || "Hi! How can I help you today?");
       setChips(r.data && r.data.quick_replies);
+      flush();
     }).catch(function () {
       setBusy(false);
       addMessage("bot", "Hi! How can I help you today?");
+      flush();
     });
   }
 
@@ -226,7 +239,7 @@
     panel.appendChild(log);
     panel.appendChild(chips);
     panel.appendChild(form);
-    panel.appendChild(el("div", "note", "AI assistant: answers come from our own documents."));
+    panel.appendChild(el("div", "note", NOTE));
     root.appendChild(panel);
     root.appendChild(bubble);
 
@@ -237,6 +250,7 @@
 
   window.LeadDesk = {
     open: function () { if (panel) open(); },
+    ask: function (text) { if (!panel) return; pending = String(text || "").slice(0, 500); open(); },
     close: function () { if (panel) close(); }
   };
   if (document.body) build(); else document.addEventListener("DOMContentLoaded", build);
