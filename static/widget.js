@@ -19,6 +19,7 @@
   var BASE = API + (BUSINESS ? "/api/" + encodeURIComponent(BUSINESS) : "/api");
   var KEY = "leaddesk:" + BASE;
   var pending = null;  // a question asked with LeadDesk.ask() before the greeting arrived
+  var wokeNote = false;  // show the "waking up" note at most once per page
 
   function load() {
     try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
@@ -125,6 +126,17 @@
     });
   }
 
+  function wakeTimer() {
+    // A free-tier server sleeps when idle, so the first request can be slow.
+    // Reassure the visitor once if a reply is taking a while.
+    return setTimeout(function () {
+      if (busy && !wokeNote) {
+        wokeNote = true;
+        addMessage("bot", "⏳ Just waking the server up — the first reply can take up to a minute. Thanks for waiting!");
+      }
+    }, 6000);
+  }
+
   function send(text) {
     text = (text || "").trim();
     if (!text || busy) return;
@@ -133,8 +145,10 @@
     setChips([]);
     input.value = "";
     setBusy(true);
+    var wt = wakeTimer();
     request("/chat", { message: text, session_id: state.session_id || null, page: location.href.slice(0, 300) })
       .then(function (r) {
+        clearTimeout(wt);
         setBusy(false);
         if (r.data.session_id) { state.session_id = r.data.session_id; save(state); }
         if (r.ok && r.data.reply) {
@@ -147,6 +161,7 @@
         flush();
       })
       .catch(function () {
+        clearTimeout(wt);
         setBusy(false);
         addMessage("err", "Can't reach the assistant right now. Please check your connection and try again.");
       });
@@ -159,12 +174,15 @@
   function greet() {
     if (state.messages.length || busy) return flush();
     setBusy(true);
+    var gt = wakeTimer();
     request("/greeting").then(function (r) {
+      clearTimeout(gt);
       setBusy(false);
       addMessage("bot", (r.data && r.data.reply) || "Hi! How can I help you today?");
       setChips(r.data && r.data.quick_replies);
       flush();
     }).catch(function () {
+      clearTimeout(gt);
       setBusy(false);
       addMessage("bot", "Hi! How can I help you today?");
       flush();
