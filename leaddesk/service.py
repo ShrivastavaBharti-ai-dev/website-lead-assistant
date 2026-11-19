@@ -2,6 +2,7 @@
 Framework-free, so it can be tested without running a server."""
 from __future__ import annotations
 
+import datetime
 import os
 import threading
 import time
@@ -16,6 +17,10 @@ from .sinks import full_header, make_sink
 
 ROOT = Path(__file__).resolve().parent.parent
 MAX_MESSAGE_CHARS = 500
+# A global cap on live model calls per day, shared across all visitors and
+# businesses, so a public demo can't run the owner's API key past a daily budget.
+# Override with the MAX_LLM_CALLS_PER_DAY environment variable.
+MAX_LLM_CALLS_PER_DAY = int(os.getenv("MAX_LLM_CALLS_PER_DAY", "500"))
 
 
 class RateLimiter:
@@ -39,6 +44,31 @@ class RateLimiter:
                 for k in [k for k, v in self._hits.items() if not v][:1000]:
                     del self._hits[k]
             return True
+
+
+class DailyCap:
+    """A global per-day limit on live model calls, shared across every visitor and
+    business. Thread-safe; the count resets on a new date (server local) and on
+    restart. A safety net on top of the per-visitor RateLimiter."""
+
+    def __init__(self, limit: int):
+        self.limit = limit
+        self._day: datetime.date | None = None
+        self._count = 0
+        self._lock = threading.Lock()
+
+    def allow(self) -> bool:
+        with self._lock:
+            today = datetime.date.today()
+            if self._day != today:
+                self._day, self._count = today, 0
+            if self._count >= self.limit:
+                return False
+            self._count += 1
+            return True
+
+
+_daily_cap = DailyCap(MAX_LLM_CALLS_PER_DAY)
 
 
 class LeadService:
@@ -83,6 +113,11 @@ class LeadService:
         if session.messages >= self.max_messages:
             return 200, {"session_id": session.id, "reply": self.chat_end, "quick_replies": [],
                          "lead_complete": session.submitted}
+        if self.mode.startswith("gemini") and not _daily_cap.allow():
+            return 200, {"session_id": session.id, "quick_replies": [], "lead_complete": session.submitted,
+                         "reply": "This public demo has paused for today after reaching its daily limit, which "
+                                  "keeps it inside its free API budget. Please try again tomorrow, or contact "
+                                  "the team directly."}
         try:
             reply = self.conversation.handle(session, message)
         except Exception as error:  # noqa: BLE001
