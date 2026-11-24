@@ -1,0 +1,13 @@
+# Render's free plan sleeps after 15 idle minutes and takes ~1 minute to wake.
+# Visiting every 10 minutes keeps the live demo fast for people clicking from an email.
+# ponytail: GitHub may delay scheduled runs and pauses them after 60 days with no repo commits.
+name: Keep the demo awake
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS --retry 3 --max-time 120 https://website-lead-assistant.onrender.com/api/estate/health
