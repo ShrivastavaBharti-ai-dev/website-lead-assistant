@@ -12,7 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Writable cache/leads dirs (filesystem may be ephemeral; that's fine for a demo).
-RUN mkdir -p .cache leads
+# Precomputed document embeddings (embeddings/*.json), so startup makes no API calls and a
+# rate-limited key can't crash a deploy. Changed documents are embedded on startup as before.
+RUN mkdir -p .cache leads && for f in embeddings/*.json; do cp "$f" ".cache/embeddings-$(basename "$f")"; done
 
 # Hugging Face Spaces expects 7860; Render/Koyeb set $PORT. Support both.
 ENV PORT=7860
