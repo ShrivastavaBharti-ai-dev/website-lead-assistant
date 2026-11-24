@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A website assistant for dental practices | Bharti Shrivastava</title>
+<meta name="description" content="An AI assistant for your practice website that answers new patients out of hours, takes appointment requests and sends urgent cases to your phone line or NHS 111. Free 14-day pilot.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/landing.css">
+<style>:root { --accent: #1F5A4E; }</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><strong>Bharti Shrivastava</strong> <span>builds AI assistants for dental practices</span></div>
+    <a href="mailto:bharti.aiautomation@gmail.com?subject=Free%2014-day%20pilot%20for%20my%20practice">Email me</a>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Your reception closes at six. New patients keep asking.</h1>
+      <p class="intro">An assistant on your practice website that answers fee, treatment and opening-hours questions from your own price list. It takes appointment requests one question at a time and puts them in a Google Sheet your reception team reads in the morning. It never gives dental advice.</p>
+      <div class="actions">
+        <button type="button" class="btn primary" onclick="window.LeadDesk && LeadDesk.open()">Try the assistant</button>
+        <a class="btn secondary" href="mailto:bharti.aiautomation@gmail.com?subject=Free%2014-day%20pilot%20for%20my%20practice">Start a free 14-day pilot</a>
+      </div>
+    </div>
+
+    <div class="night">
+      <p class="label">Messages like these reach practice websites out of hours. Ask one and watch the reply.</p>
+      <ol>
+        <li><time>Sun 20:40</time><q>How much is a check-up for a new patient?</q><button type="button" data-ask>Ask it</button></li>
+        <li><time>Mon 06:15</time><q>I'm nervous about the dentist. What do you do for nervous patients?</q><button type="button" data-ask>Ask it</button></li>
+        <li><time>Sat 17:05</time><q>Do you do clear aligners, and how much do they cost?</q><button type="button" data-ask>Ask it</button></li>
+        <li><time>Fri 23:30</time><q>My front tooth has cracked and it really hurts.</q><button type="button" data-ask>Ask it</button></li>
+      </ol>
+      <p class="foot">The assistant answers as Amberwick Dental, a fictional Leeds practice. Please don't type real health details.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>How the free pilot works</h2>
+    <p class="sub">Fourteen days on your own website, with your own fees and opening hours. You don't pay anything during the pilot.</p>
+    <ol class="steps">
+      <li><h3>Send your details</h3><p>Your price list, opening hours, emergency arrangements and the questions reception answers most.</p></li>
+      <li><h3>I set it up</h3><p>I load them into the assistant and test it, including urgent and advice questions, before it goes live.</p></li>
+      <li><h3>Add one line</h3><p>One line of code on your website, or I send it to whoever looks after your site.</p></li>
+      <li><h3>Keep it or remove it</h3><p>After 14 days you decide. If it isn't worth it, delete the line and that's the end of it.</p></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>What it won't do</h2>
+    <p class="sub">Clinical questions stay with your clinicians. The assistant only handles the front desk.</p>
+    <div class="limits">
+      <div><h3>No dental advice</h3><p>Questions about symptoms or treatment get a fixed reply that points to your team. The AI doesn't write that reply.</p></div>
+      <div><h3>Urgent cases go to a person</h3><p>Pain, swelling, bleeding or a broken tooth gets your phone number, NHS 111, and 999 or A&amp;E for emergencies.</p></div>
+      <div><h3>No guessing</h3><p>If a question isn't covered by your documents, it says it can't answer instead of making something up.</p></div>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Want it on your practice website?</h2>
+    <p>Email me with your practice name and website. I'll reply within one working day with a pilot date. You can also see the assistant on a <a href="/dental">full demo practice website</a>.</p>
+    <a class="btn primary" href="mailto:bharti.aiautomation@gmail.com?subject=Free%2014-day%20pilot%20for%20my%20practice">Email bharti.aiautomation@gmail.com</a>
+  </div>
+
+  <footer>This page uses no cookies or tracking. Built by Bharti Shrivastava, AI automation engineer. Code on <a href="https://github.com/ShrivastavaBharti-ai-dev/website-lead-assistant">GitHub</a>.</footer>
+</div>
+
+<script src="/widget.js" data-business="dental" data-title="Amberwick Dental (demo)" data-color="#1F5A4E"
+        data-note="AI assistant, not a dentist. Please don't type medical details. Demo: what you type goes to a test sheet only Bharti sees and is deleted within 30 days." defer></script>
+<script>
+  document.querySelectorAll("[data-ask]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      window.LeadDesk && LeadDesk.ask(button.previousElementSibling.textContent);
+    });
+  });
+</script>
+</body>
+</html>

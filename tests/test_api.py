@@ -61,6 +61,14 @@ def test_each_business_has_its_own_page_and_assistant(client):
     assert client.post("/api/nowhere/chat", json={"message": "hi"}).status_code == 404
 
 
+def test_pitch_pages_load_their_own_assistant(client):
+    for niche, business in (("estate-agents", "estate"), ("dental-practices", "dental")):
+        page = client.get(f"/for/{niche}")
+        assert page.status_code == 200 and f'data-business="{business}"' in page.text
+    assert client.get("/landing.css").status_code == 200
+    assert client.get("/for/plumbers").status_code == 404
+
+
 def test_dental_urgent_reply_over_http(client):
     from server.main import services
     from leaddesk import MemorySink

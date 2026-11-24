@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A website assistant for estate agents | Bharti Shrivastava</title>
+<meta name="description" content="An AI assistant for your agency's website that answers buyers, tenants, sellers and landlords out of hours and books viewings and valuations. Free 14-day pilot.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/landing.css">
+<style>:root { --accent: #1F4E6B; }</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><strong>Bharti Shrivastava</strong> <span>builds AI assistants for estate agents</span></div>
+    <a href="mailto:bharti.aiautomation@gmail.com?subject=Free%2014-day%20pilot%20for%20my%20agency">Email me</a>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Answer every enquiry, even the ones that arrive after you've gone home.</h1>
+      <p class="intro">An assistant on your website that answers buyers, tenants, sellers and landlords from your own listings and fee guide. It books viewings and valuations, asks about budget, mortgage and chain, and puts every lead in a Google Sheet your team reads in the morning.</p>
+      <div class="actions">
+        <button type="button" class="btn primary" onclick="window.LeadDesk && LeadDesk.open()">Try the assistant</button>
+        <a class="btn secondary" href="mailto:bharti.aiautomation@gmail.com?subject=Free%2014-day%20pilot%20for%20my%20agency">Start a free 14-day pilot</a>
+      </div>
+    </div>
+
+    <div class="night">
+      <p class="label">Messages like these reach agency websites after 6 pm. Ask one and watch the reply.</p>
+      <ol>
+        <li><time>Sun 21:47</time><q>Tell me about the 2-bed flat in Clifton. Could I view it on Saturday?</q><button type="button" data-ask>Ask it</button></li>
+        <li><time>Tue 22:15</time><q>What's your fee for selling a 3-bed house?</q><button type="button" data-ask>Ask it</button></li>
+        <li><time>Sat 18:30</time><q>I'm a landlord with a flat in Totterdown. Do you offer full management?</q><button type="button" data-ask>Ask it</button></li>
+        <li><time>Mon 06:52</time><q>How does a valuation work? Can someone come next week?</q><button type="button" data-ask>Ask it</button></li>
+      </ol>
+      <p class="foot">The assistant answers as Harbour &amp; Finch, a fictional Bristol agency, so you can test it on real-looking listings.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>How the free pilot works</h2>
+    <p class="sub">Fourteen days on your own website, with your own listings and fees. You don't pay anything during the pilot.</p>
+    <ol class="steps">
+      <li><h3>Send your details</h3><p>Your fee guide, opening hours, branch areas and the questions your team answers most.</p></li>
+      <li><h3>I set it up</h3><p>I load them into the assistant and test it on your listings before it goes live.</p></li>
+      <li><h3>Add one line</h3><p>One line of code on your website, or I send it to whoever looks after your site.</p></li>
+      <li><h3>Keep it or remove it</h3><p>After 14 days you decide. If it isn't worth it, delete the line and that's the end of it.</p></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>What it won't do</h2>
+    <p class="sub">It only says what your documents say, and hands anything else to your team.</p>
+    <div class="limits">
+      <div><h3>No made-up answers</h3><p>If the answer isn't in your listings or guides, it says so instead of guessing, and offers a call with your team.</p></div>
+      <div><h3>No price guesses</h3><p>It books a valuation instead of putting a figure on someone's home.</p></div>
+      <div><h3>No hidden data</h3><p>Leads go into a Google Sheet you own, and hot leads (sellers, landlords, ready buyers) also email you straight away.</p></div>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Want it on your website?</h2>
+    <p>Email me with your agency's name and website. I'll reply within one working day with a pilot date. You can also see the assistant on a <a href="/estate">full demo agency website</a>.</p>
+    <a class="btn primary" href="mailto:bharti.aiautomation@gmail.com?subject=Free%2014-day%20pilot%20for%20my%20agency">Email bharti.aiautomation@gmail.com</a>
+  </div>
+
+  <footer>This page uses no cookies or tracking. Built by Bharti Shrivastava, AI automation engineer. Code on <a href="https://github.com/ShrivastavaBharti-ai-dev/website-lead-assistant">GitHub</a>.</footer>
+</div>
+
+<script src="/widget.js" data-business="estate" data-title="Harbour &amp; Finch (demo)" data-color="#1F4E6B"
+        data-note="AI assistant. Demo: what you type goes to a test sheet only Bharti sees and is deleted within 30 days." defer></script>
+<script>
+  document.querySelectorAll("[data-ask]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      window.LeadDesk && LeadDesk.ask(button.previousElementSibling.textContent);
+    });
+  });
+</script>
+</body>
+</html>

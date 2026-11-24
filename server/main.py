@@ -40,6 +40,8 @@ limiter = RateLimiter()
 services = {p.KEY: build_service(p, limiter=limiter) for p in (interior, estate, dental)}
 service = services[interior.KEY]
 PAGES = {interior.KEY: "index.html", estate.KEY: "estate.html", dental.KEY: "dental.html"}
+# Pitch pages for business owners, linked from outreach emails.
+LANDING = {"estate-agents": "for-estate-agents.html", "dental-practices": "for-dental-practices.html"}
 
 app = FastAPI(title="LeadDesk", description="Website assistant that answers questions and captures leads.",
               version="1.1")
@@ -90,6 +92,19 @@ def health(business: str = interior.KEY) -> dict:
 def widget() -> FileResponse:
     return FileResponse(STATIC / "widget.js", media_type="application/javascript",
                         headers={"Cache-Control": "public, max-age=300"})
+
+
+@app.get("/landing.css", include_in_schema=False)
+def landing_css() -> FileResponse:
+    return FileResponse(STATIC / "landing.css", media_type="text/css",
+                        headers={"Cache-Control": "public, max-age=300"})
+
+
+@app.get("/for/{niche}", include_in_schema=False)
+def landing(niche: str) -> FileResponse:
+    if niche not in LANDING:
+        raise HTTPException(404, "Page not found.")
+    return FileResponse(STATIC / LANDING[niche], media_type="text/html")
 
 
 @app.get("/", include_in_schema=False)
