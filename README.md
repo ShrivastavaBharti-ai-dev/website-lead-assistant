@@ -2,7 +2,8 @@
 
 A chat bubble for any website. It answers visitors' questions from the business's own documents. When a visitor is interested, it collects their details one question at a time, scores the lead as **hot, warm or cold**, adds it to a **Google Sheet** and **emails the owner about hot leads**.
 
-**Live demo:** _link coming soon_ (the free server sleeps when idle, so the first message can take up to a minute)  
+**Live demos:** [estate agency](https://website-lead-assistant.onrender.com/estate) · [dental practice](https://website-lead-assistant.onrender.com/dental) · [interior studio](https://website-lead-assistant.onrender.com/)  
+**For business owners:** [estate agents](https://website-lead-assistant.onrender.com/for/estate-agents) · [dental practices](https://website-lead-assistant.onrender.com/for/dental-practices)  
 **Built by:** Bharti Shrivastava, AI automation engineer. [Hire me on Contra](https://contra.com/bharti_shrivastava_zu3hypce) to add this to your website.
 
 ---
@@ -17,9 +18,11 @@ LeadDesk answers the questions that make people hesitate (prices, areas served, 
 
 There are three demo websites, each for a *fictional* business with its own documents, questions and lead scoring:
 
-- **`/estate`: Harbour & Finch, a Bristol estate agency.** Press "Ask about this home" on any listing, book a viewing as a buyer (it asks about budget, mortgage and chain) or ask for a valuation. Sellers and landlords are always hot leads.
-- **`/dental`: Amberwick Dental, a private practice in Leeds.** Ask about fees or nervous patients, or request an appointment. Mention pain or an accident and it gives the practice phone number, NHS 111 and 999 guidance instead of advice, every time.
-- **`/`: Terracotta Lane Interiors**, described below.
+- **[`/estate`](https://website-lead-assistant.onrender.com/estate): Harbour & Finch, a Bristol estate agency.** Press "Ask about this home" on any listing, book a viewing as a buyer (it asks about budget, mortgage and chain) or ask for a valuation. Sellers and landlords are always hot leads.
+- **[`/dental`](https://website-lead-assistant.onrender.com/dental): Amberwick Dental, a private practice in Leeds.** Ask about fees or nervous patients, or request an appointment. Mention pain or an accident and it gives the practice phone number, NHS 111 and 999 guidance instead of advice, every time.
+- **[`/`](https://website-lead-assistant.onrender.com/): Terracotta Lane Interiors**, described below.
+
+Business owners get a short page each, [`/for/estate-agents`](https://website-lead-assistant.onrender.com/for/estate-agents) and [`/for/dental-practices`](https://website-lead-assistant.onrender.com/for/dental-practices), where every example question can be asked on the live assistant with one click.
 
 The interior studio site belongs to **Terracotta Lane Interiors**, a *fictional* interior design studio in Pune. Open the chat bubble and try:
 
@@ -124,16 +127,16 @@ Open http://127.0.0.1:8000 for the demo website, or http://127.0.0.1:8000/docs f
 To send leads to a Google Sheet, follow the five steps at the top of `integrations/google_apps_script.gs`, then put the web app URL and token in `.env`.
 
 ```bash
-pytest                    # 64 tests, no key needed
+pytest                    # 257 tests, no key needed
 python eval/run_eval.py   # rules vs Gemini on scripted conversations
 ```
 
 ## Project structure
 
 ```
-server/main.py              FastAPI: /api/<business>/chat|greeting|health, /widget.js, demo sites
+server/main.py              FastAPI: /api/<business>/chat|greeting|health, /widget.js, demo sites, /for/<niche>
 static/widget.js            the embeddable chat bubble (no dependencies)
-static/*.html               demo websites: index (interior studio), estate, dental
+static/*.html               demo websites (index, estate, dental) and pitch pages (for-*.html, landing.css)
 leaddesk/
   conversation.py           the chat flow: answer, ask, submit
   extract.py                Gemini structured extraction + rule-based fallback
@@ -143,21 +146,23 @@ leaddesk/
   service.py                sessions, rate limits, error handling
   faq.py                    answers from the business documents
 docanswer/                  retrieval engine reused from the document chatbot project
-business/                   the studio's documents (services, prices, process)
+business/                   each demo business's documents (services, prices, process)
+embeddings/                 saved document embeddings, so the server starts without API calls
 integrations/               Google Apps Script for the Sheet and email alerts
 eval/                       scripted conversations, questions and the evaluation
+.github/workflows/          keeps the free live demo awake
 ```
 
 ## Limitations
 
 - Chats in progress are kept in the server's memory, so a restart loses unfinished chats (finished leads are already saved). A busy site would use Redis or a database.
-- The free Render server sleeps after 15 minutes without visitors; the first message then takes up to a minute. A paid instance removes this.
-- Scoring rules and questions are examples for an interior studio; each business sets its own.
-- The evaluation uses 9 scripted conversations, which is enough to compare approaches, not a guarantee.
+- The live demo runs on Render's free plan, which sleeps after 15 minutes without visitors. A GitHub Actions job visits it every 10 minutes; if GitHub delays a run, the first message can take up to a minute. A paid instance removes this.
+- Scoring rules and questions are examples for the three demo businesses; each real business sets its own.
+- The evaluation uses 25 scripted conversations across the three demos, which is enough to compare approaches, not a guarantee.
 
 ## Want this for your business?
 
-I build website assistants like this for clinics, coaching institutes, real-estate agents, interior designers and other service businesses, connected to your documents, your Google Sheet or CRM, and your own lead rules. [Message me on Contra](https://contra.com/bharti_shrivastava_zu3hypce).
+I build website assistants like this for clinics, coaching institutes, real-estate agents, interior designers and other service businesses, connected to your documents, your Google Sheet or CRM, and your own lead rules. Email [bharti.aiautomation@gmail.com](mailto:bharti.aiautomation@gmail.com) or [message me on Contra](https://contra.com/bharti_shrivastava_zu3hypce). Estate agents and dental practices can start with a free 14-day pilot.
 
 ---
 
