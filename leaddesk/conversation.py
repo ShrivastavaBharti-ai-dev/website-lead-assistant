@@ -73,6 +73,10 @@ class Conversation:
         parts: list[str] = []
         choices: list[str] = []
         question = understood["question"]
+        if not question and "?" in message and session.asked is None:
+            # The AI can file a question that sounds like a booking ("Can someone value my house next week?")
+            # as a booking only: still look the visitor's own words up in the documents.
+            question = message.strip()[:300]
         if urgent:
             parts.append(urgent[0])
             question = ""   # the fixed reply is the whole answer: nothing from the documents or the AI

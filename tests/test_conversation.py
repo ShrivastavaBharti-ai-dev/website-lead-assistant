@@ -72,3 +72,17 @@ def test_after_submission_questions_still_answered_and_no_second_lead(faq):
 def test_spreadsheet_formula_text_is_kept_as_plain_text_by_name_parser(faq):
     session, _, _ = talk(faq, ["Book a consultation", "=HYPERLINK(\"x\")"])
     assert "name" not in session.lead
+
+
+class BookingOnlyExtractor(RulesExtractor):
+    """Like the live AI on a booking-style question: no question, wants a consultation."""
+    def extract(self, message, asked, lead):
+        result = super().extract(message, asked, lead)
+        result["question"], result["wants_consultation"] = "", True
+        return result
+
+
+def test_question_read_as_booking_is_still_answered(faq):
+    chat, session = Conversation(interior, BookingOnlyExtractor(interior), faq, MemorySink()), Session()
+    reply = chat.handle(session, "How much does a modular kitchen cost?")
+    assert "2.5 lakh" in reply.text and session.collecting
