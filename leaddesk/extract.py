@@ -82,7 +82,9 @@ class GeminiExtractor:
                 result["fields"][key] = value
             else:
                 result["fields"].pop(key, None)
-        result["question"] = str(raw.get("question") or "").strip()[:300]
+        question = str(raw.get("question") or "").strip()
+        # The prompt allows "none" for empty values; the model sometimes uses it here too.
+        result["question"] = "" if question.lower() == "none" else question[:300]
         result["wants_consultation"] = bool(raw.get("wants_consultation")) or bool(self.profile.WANTS.search(message))
         return result
 

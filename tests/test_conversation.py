@@ -86,3 +86,16 @@ def test_question_read_as_booking_is_still_answered(faq):
     chat, session = Conversation(interior, BookingOnlyExtractor(interior), faq, MemorySink()), Session()
     reply = chat.handle(session, "How much does a modular kitchen cost?")
     assert "2.5 lakh" in reply.text and session.collecting
+
+
+
+def test_ai_saying_none_for_the_question_means_no_question():
+    from leaddesk.extract import GeminiExtractor
+
+    class FakeChain:
+        def invoke(self, _):
+            return {"question": "none", "wants_consultation": False}
+
+    extractor = object.__new__(GeminiExtractor)   # no API key: only the parsing is under test
+    extractor.profile, extractor._chain = interior, FakeChain()
+    assert extractor.extract("How much does a modular kitchen cost?", None, {})["question"] == ""
